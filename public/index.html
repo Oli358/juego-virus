@@ -1,549 +1,2336 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virus Ultimate - Final Deluxe</title>
+    <title>Virus</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦠</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
     <style>
-        :root { --font-main: 'Varela Round', sans-serif; }
-        
-        body { 
-            font-family: var(--font-main); 
-            background: linear-gradient(45deg, #2c3e50, #4ca1af, #2c3e50, #8e44ad, #2c3e50, #c0392b, #2c3e50);
-            background-size: 600% 600%;
+        :root {
+            --font-main: 'Varela Round', sans-serif;
+            --accent: #00f3ff;
+        }
+
+        body {
+            font-family: var(--font-main);
+            /* New Green/Blue Theme */
+            background: linear-gradient(-45deg, #004d40, #006064, #1b5e20, #01579b, #004d40);
+            background-size: 400% 400%;
             animation: gradientBG 20s ease infinite;
-            color: white; margin: 0; padding-bottom: 220px; user-select: none; overflow-x: hidden; min-height: 100vh;
+            color: white;
+            margin: 0;
+            padding-bottom: 220px;
+            user-select: none;
+            overflow-x: hidden;
+            min-height: 100vh;
+            /* Global Smoothness */
+            transition: background 1s ease;
         }
-        @keyframes gradientBG { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-        .oculto { display: none !important; }
-        
-        /* MODALES */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-box { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); padding: 30px; border-radius: 20px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 0 50px rgba(0,0,0,0.5); text-align: left; }
-        .modal-close { float: right; font-size: 2rem; cursor: pointer; color: #e74c3c; }
-        .modal-h2 { color: #f1c40f; text-align: center; margin-top: 0; text-shadow: 0 0 10px black; }
-        .carta-demo { display: inline-block; background: #333; padding: 5px; border-radius: 5px; margin: 2px; font-size: 0.9rem; }
 
-        /* ANIMACIONES */
-        .anim-desaparicion { animation: vanish 0.8s forwards ease-in; border-color: red !important; background-color: rgba(255, 0, 0, 0.2) !important; }
-        @keyframes vanish { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.9) rotate(5deg); opacity: 0.8; } 100% { transform: scale(0) rotate(-10deg); opacity: 0; } }
-
-        #flash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1500; opacity: 0; transition: opacity 0.5s; }
-        .flash-verde { background: radial-gradient(circle, transparent 20%, rgba(0, 255, 0, 0.6) 100%); animation: glowScreen 1.5s; }
-        .flash-dorado { background: radial-gradient(circle, transparent 20%, rgba(255, 215, 0, 0.6) 100%); animation: glowScreen 1.5s; }
-        @keyframes glowScreen { 0%,100% { opacity:0; } 50% { opacity:1; } }
-
-        .particula { position: fixed; pointer-events: none; font-size: 2rem; z-index: 2000; animation: floatUp 1s forwards cubic-bezier(0,0,0.2,1); }
-        @keyframes floatUp { 0% { transform: translate(0,0) scale(0.5); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; } }
-
-        @keyframes drawCard { 0% { transform: translateY(-50vh) rotate(360deg) scale(0.1); opacity: 0; } 100% { transform: translateY(0) rotate(0); opacity: 1; } }
-        .anim-robar { animation: drawCard 0.4s ease-out backwards; }
-        @keyframes infectPulse { 50% { transform: scale(1.3); filter: drop-shadow(0 0 10px lime); } }
-        .anim-infectar { animation: infectPulse 0.5s ease-in-out; }
-        @keyframes cureShine { 50% { transform: translateY(-10px); filter: brightness(2) drop-shadow(0 0 15px cyan); } }
-        .anim-curar { animation: cureShine 0.5s ease-in-out; }
-        @keyframes shieldRotate { 50% { border-color: gold; box-shadow: 0 0 20px gold; } }
-        .anim-inmunizar { animation: shieldRotate 0.8s ease-in-out; }
-
-        /* ESTILOS INTERFAZ */
-        #vista-menu, #vista-lobby { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 0; }
-        .caja-menu { 
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); 
-            padding: 30px; border-radius: 20px; text-align: center; width: 90%; max-width: 400px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        * {
+            transition: box-shadow 0.3s ease, transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
+            box-sizing: border-box;
+            /* FIX: Global sizing */
+            margin: 0;
+            padding: 0;
+            /* Reset basic */
         }
-        input { width: 80%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 1.1rem; text-align: center; font-family: var(--font-main); }
-        button { width: 100%; padding: 15px; margin: 10px 0; font-size: 1.2rem; border-radius: 10px; border: none; cursor: pointer; font-family: var(--font-main); font-weight: bold; transition: transform 0.2s; }
-        button:hover { transform: scale(1.05); }
-        .btn-crear { background: #27ae60; color: white; } .btn-unir { background: #2980b9; color: white; }
-        .btn-volver { background: #8e44ad; color: white; box-shadow: 0 0 15px #8e44ad; }
-        .btn-info { background: rgba(255,255,255,0.2); border: 1px solid white; color: white; width: 45%; display: inline-block; margin: 5px; font-size: 1rem; }
-        
-        .codigo-sala { font-size: 3rem; color: #f1c40f; border: 2px dashed #f1c40f; padding: 10px 30px; border-radius: 15px; cursor: pointer; background: rgba(0,0,0,0.2); }
-        .lista-jugadores { width: 90%; max-width: 500px; margin-top: 20px; }
-        .item-jugador { background: rgba(255,255,255,0.9); color: #333; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.2rem; }
-        .estado-listo { background: #2ecc71; color: white; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; }
-        .btn-kick { background: #c0392b; color: white; border: none; border-radius: 5px; padding: 5px 10px; font-size: 1rem; cursor: pointer; margin-left: 10px; width: auto; margin-top: 0; }
-        
-        /* SELECTOR EMOJI */
-        .emoji-select { font-size: 1.5rem; background: transparent; border: none; cursor: pointer; padding: 0 5px; }
-        
-        #zona-central { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); border-radius: 0 0 20px 20px; }
-        .mazo-slot { width: 80px; height: 120px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; background: #ecf0f1; color: #333; position: relative; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
-        #info-turno { font-size: 1.6rem; font-weight: bold; text-align: center; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        #accion-log { background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 20px; font-size: 1rem; border: 1px solid rgba(255,255,255,0.2); margin-top: 5px; color: #ecf0f1; }
 
-        .mesa-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; transition: all 0.5s; width: 100%; box-sizing: border-box; }
-        .mesa-normal .jugador-tablero { transform: scale(1); }
-        .mesa-peque .jugador-tablero { transform: scale(0.85); margin: -10px; }
-        .mesa-mini .jugador-tablero { transform: scale(0.7); margin: -25px; }
+        /* ... keys ... */
 
-        .jugador-tablero { background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border-radius: 15px; padding: 15px; width: 220px; min-height: 140px; transition: 0.3s; position: relative; border: 1px solid rgba(255,255,255,0.1); }
-        .turno-activo { border: 3px solid #f1c40f; background: rgba(255,255,255,0.15); transform: scale(1.02); box-shadow: 0 0 20px rgba(241,196,15,0.3); }
+        .caja-menu {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 450px;
+            /* Even wider */
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            margin: 0 auto;
+            /* Ensure no weird margins */
+            max-width: 90%;
+            /* Resp */
+        }
 
-        .carta { width: 80px; height: 120px; border-radius: 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: white; border: 3px solid rgba(255,255,255,0.5); box-shadow: 0 5px 15px rgba(0,0,0,0.4); margin: 3px; position: relative; background: white; cursor: pointer; transition: transform 0.2s; }
-        .carta:hover { transform: translateY(-15px) scale(1.1); z-index: 100; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        #mis-cartas .carta { width: 70px; height: 105px; font-size: 0.7rem; }
-        #mis-cartas .icono { font-size: 2rem; }
-        .carta.seleccionada-jugar { border: 4px solid #f1c40f; transform: translateY(-25px); box-shadow: 0 0 20px #f1c40f; }
-        .carta.seleccionada-basura { opacity: 0.6; transform: scale(0.9); border: 4px solid #e74c3c; filter: grayscale(100%); }
-        .target-valido { box-shadow: 0 0 20px cyan !important; transform: scale(1.15); z-index: 50; cursor: crosshair; }
-        .carta-invalida { opacity: 0.6; filter: grayscale(0.3); cursor: not-allowed !important; box-shadow: none; border-color: #7f8c8d; }
-        .carta-invalida:hover { transform: none !important; box-shadow: none; }
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
 
-        .overlay-icon { position: absolute; top: -10px; right: -10px; font-size: 1.8rem; z-index: 10; filter: drop-shadow(2px 2px 0 #000); }
-        .icono { font-size: 2.5rem; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
-        
-        .rojo { background: linear-gradient(135deg, #ff7675, #d63031); } 
-        .azul { background: linear-gradient(135deg, #74b9ff, #0984e3); } 
-        .verde { background: linear-gradient(135deg, #55efc4, #00b894); } 
-        .amarillo { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #d35400 !important; } 
-        .multicolor { background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1); border: 3px solid white; }
-        .especial { background: linear-gradient(135deg, #a18cd1, #fbc2eb); border: 3px solid white; }
+            50% {
+                background-position: 100% 50%;
+            }
 
-        #panel-inferior { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.1); padding: 10px; display: flex; flex-direction: column; align-items: center; z-index: 900; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
-        #mis-cartas { display: flex; gap: 10px; min-height: 115px; align-items: center; }
-        .btn-accion { width: auto; padding: 8px 25px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 10px; border:none; color:white; font-weight:bold; cursor:pointer; }
-        .btn-descartar { background: #95a5a6; } .btn-descartar.activo { background: #e74c3c; } .btn-confirmar { background: #d35400; display: none; }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
 
-        #overlay-aviso, #pantalla-ganador { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        #texto-aviso { font-size: 3rem; color: #f1c40f; padding: 20px; white-space: pre-line; text-shadow: 0 0 20px black; }
-        #barra-progreso { width: 0%; height: 8px; background: #f1c40f; border-radius: 4px; transition: width 4s linear; margin-top: 20px; }
-        .mazo-reciclado { animation: spin 1s; box-shadow: 0 0 20px #f1c40f; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .oculto {
+            display: none !important;
+        }
 
-        /* PANTALLA GANADOR MEJORADA */
-        .ganador-contenedor { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 5vh; height: 100%; overflow-y: auto; }
-        .texto-victoria-grande { font-size: 5rem; color: #f1c40f; text-shadow: 0 0 30px #f1c40f; margin: 0; line-height: 1.1; overflow-wrap: break-word; text-align: center; width: 90%; }
-        .copa-victoria { font-size: 6rem; animation: bounceCopa 2s infinite; }
-        .ganador-subir { animation: subirGanador 1s ease-in-out forwards; }
-        @keyframes subirGanador { to { transform: scale(0.8) translateY(-20px); } }
-        
-        .stats-container { display: flex; gap: 20px; margin-top: 10px; justify-content: center; flex-wrap: wrap; }
-        .stat-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; padding: 10px; text-align: center; width: 150px; }
-        
-        .lista-final-jugadores { width: 90%; max-width: 500px; margin-top: 20px; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; }
-        .item-final { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.2rem; }
-        .tick-verde { color: #2ecc71; font-size: 1.5rem; }
+        /* BORDE TURNO */
+        body.mi-turno-borde {
+            box-shadow: inset 0 0 30px 10px #00f3ff, inset 0 0 80px rgba(0, 243, 255, 0.4);
+            animation: pulseBorde 1.5s infinite alternate;
+        }
+
+        @keyframes pulseBorde {
+            0% {
+                box-shadow: inset 0 0 20px 5px #00f3ff;
+            }
+
+            100% {
+                box-shadow: inset 0 0 50px 15px #00f3ff;
+            }
+        }
+
+        /* FONDO */
+        .bg-anim {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.5;
+            /* Much brighter! */
+        }
+
+        .floater {
+            position: absolute;
+            font-size: 2.5rem;
+            animation: floatUp linear infinite;
+            pointer-events: none !important;
+            /* SEGURIDAD */
+        }
+
+        /* DEPTH LAYERS FOR PARALLAX */
+        .depth-1 {
+            filter: blur(0px);
+            transform: scale(1.5);
+            z-index: 3;
+            opacity: 1;
+            /* Full bright */
+        }
+
+        .depth-2 {
+            filter: blur(2px);
+            transform: scale(1);
+            z-index: 2;
+            opacity: 0.8;
+            /* Brighter */
+        }
+
+        .depth-3 {
+            filter: blur(5px);
+            transform: scale(0.6);
+            z-index: 1;
+            opacity: 0.5;
+            /* Brighter */
+        }
+
+        @keyframes floatUp {
+            from {
+                transform: translateY(110vh) rotate(0deg);
+            }
+
+            to {
+                transform: translateY(-10vh) rotate(360deg);
+            }
+        }
+
+        /* LOG ESPECIAL RGB ANIMADO */
+        .log-special {
+            color: #fff !important;
+            animation: rainbow 2s infinite;
+            font-size: 2.2rem !important;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.9) !important;
+            position: relative;
+            z-index: 1000;
+            border: 5px solid transparent !important;
+            border-image: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000) 1 !important;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5) !important;
+        }
+
+        @keyframes rainbow {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        @keyframes blinkLog {
+            from {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+
+            to {
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        /* CARTAS VOLADORAS (FIXED POSITION RELATIVO AL VIEWPORT) */
+        .card-flying {
+            position: fixed;
+            z-index: 99999 !important;
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.8);
+            transform-origin: center center;
+            border-radius: 8px;
+            /* FIX: Bordes redondeados */
+        }
+
+        .particula {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2rem;
+            z-index: 99999;
+            animation: floatPart 1s forwards;
+        }
+
+        @keyframes floatPart {
+            to {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* ANIMACIÓN DE ROBO (MAZO A MANO) */
+        @keyframes drawFromDeck {
+            0% {
+                transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(180deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translate(0, 0) scale(1) rotate(0);
+                opacity: 1;
+            }
+        }
+
+        .anim-robar {
+            animation: drawFromDeck 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        }
+
+        /* INTERFAZ */
+        #vista-menu,
+        #vista-lobby {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 5000 !important;
+            display: grid !important;
+            place-items: center !important;
+            background: rgba(0, 0, 0, 0.3) !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* FIX: Override forced grid when hidden */
+        #vista-menu.oculto,
+        #vista-lobby.oculto {
+            display: none !important;
+        }
+
+        .caja-menu {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            width: 450px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        input {
+            width: 90%;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            font-family: var(--font-main);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: var(--font-main);
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.03);
+        }
+
+        .btn-crear {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-unir {
+            background: #2980b9;
+            color: white;
+        }
+
+        .btn-info {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 45%;
+            display: inline-block;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+
+        .codigo-sala {
+            font-size: 3rem;
+            color: #f1c40f;
+            border: 2px dashed #f1c40f;
+            padding: 10px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-kick {
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .emoji-select {
+            font-size: 1.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+
+        /* ZONA JUEGO */
+        #zona-central {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            height: 150px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .mazo-slot {
+            width: 90px;
+            height: 130px;
+            background: #2c3e50;
+            border-radius: 10px;
+            border: 3px solid #34495e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ecf0f1;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #slot-basura {
+            background: transparent;
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes blinkWarn {
+            0% {
+                opacity: 1;
+                text-shadow: 0 0 10px red;
+            }
+
+            50% {
+                opacity: 0.6;
+                text-shadow: 0 0 20px darkred;
+            }
+
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 10px red;
+            }
+        }
+
+        #mensaje-especial {
+            animation: blinkWarn 2s infinite ease-in-out;
+            /* Slowed down from 0.5s or default */
+            font-size: 3rem;
+            text-align: center;
+            color: #e74c3c;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #c0392b;
+            border-radius: 15px;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.3);
+        }
+
+        #accion-log {
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            margin: 0 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+
+        #accion-log b {
+            color: #f1c40f;
+        }
+
+        .mesa-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .jugador-tablero {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 15px;
+            min-width: 210px;
+            min-height: 150px;
+            border: 2px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .turno-activo {
+            border-color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        /* CARTAS */
+        .carta {
+            width: 80px;
+            height: 120px;
+            background: white;
+            border-radius: 8px;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 4px;
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 3px solid white;
+            transition: transform 0.2s, filter 0.2s;
+        }
+
+        .carta-mano {
+            cursor: pointer !important;
+            z-index: 20000 !important;
+            /* ULTRA HIGH to beat overlays */
+            pointer-events: auto !important;
+            position: relative;
+        }
+
+        .carta:hover {
+            transform: translateY(-15px) scale(1.05);
+            z-index: 100;
+        }
+
+        .carta-invalida {
+            filter: grayscale(1) brightness(0.6);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .carta-invalida:hover {
+            transform: none;
+        }
+
+        .seleccionada-jugar {
+            border: 4px solid #f1c40f;
+            transform: translateY(-20px);
+            box-shadow: 0 0 20px #f1c40f;
+        }
+
+        .seleccionada-basura {
+            border: 4px solid #e74c3c;
+            opacity: 0.5;
+            transform: scale(0.9);
+        }
+
+        .target-valido {
+            box-shadow: 0 0 20px 5px cyan !important;
+            transform: scale(1.1) !important;
+            z-index: 25000 !important;
+            /* Above Hand and Panel */
+            pointer-events: auto !important;
+            position: relative;
+            cursor: crosshair;
+            animation: pulseTarget 1s infinite;
+        }
+
+        @keyframes pulseTarget {
+            0% {
+                box-shadow: 0 0 15px cyan;
+            }
+
+            50% {
+                box-shadow: 0 0 30px cyan;
+            }
+
+            100% {
+                box-shadow: 0 0 15px cyan;
+            }
+        }
+
+        .inmunizado-static {
+            border: 3px solid gold !important;
+            box-shadow: 0 0 15px gold !important;
+        }
+
+        /* COLORES */
+        .rojo {
+            background: linear-gradient(135deg, #ff7675, #d63031);
+        }
+
+        .azul {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+
+        .verde {
+            background: linear-gradient(135deg, #55efc4, #00b894);
+        }
+
+        .amarillo {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #d35400;
+        }
+
+        .multicolor {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        }
+
+        .especial {
+            background: linear-gradient(135deg, #2c3e50, #000000);
+            border: 2px solid white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+
+        .icono {
+            font-size: 2.5rem;
+            filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.2));
+        }
+
+        .nombre-carta {
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-top: 5px;
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            width: 90%;
+            line-height: 1;
+        }
+
+        .overlay-icon {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 1.5rem;
+            filter: drop-shadow(2px 2px 0 black);
+            z-index: 2;
+        }
+
+        /* PANEL INFERIOR */
+        #panel-inferior {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10000;
+            /* SUPER HIGH Z-INDEX */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .botones-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            z-index: 1000;
+        }
+
+        #mis-cartas {
+            display: flex;
+            gap: 20px;
+            min-height: 140px;
+            align-items: center;
+            justify-content: center;
+            padding: 0 60px;
+            /* EVITAR QUE LAS CARTAS TOQUEN LOS BORDES */
+            z-index: 200020;
+            /* MEGA HIGH */
+            overflow: visible;
+            position: relative;
+            transform-style: preserve-3d;
+            margin-top: 10px;
+            /* Separar de botones */
+        }
+
+        .btn-accion {
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-descartar {
+            background: #7f8c8d;
+        }
+
+        .btn-descartar.activo {
+            background: #e74c3c;
+        }
+
+        .btn-confirmar {
+            background: #e67e22;
+            display: none;
+        }
+
+        /* FIX: CONTENEDOR BOTONES QUE NO BLOQUEE */
+        .botones-container {
+            pointer-events: none;
+        }
+
+        .btn-accion {
+            pointer-events: auto;
+        }
+
+        #btn-jugar-especial {
+            background: linear-gradient(45deg, #f1c40f, #e67e22);
+            color: black;
+            font-weight: bold;
+            border: 2px solid white;
+            display: none;
+            position: absolute;
+            bottom: 160px;
+            animation: pulseBtn 1s infinite;
+            z-index: 1100;
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 20px gold;
+        }
+
+        #panel-esterilizacion {
+            display: none;
+            gap: 10px;
+            margin-bottom: 10px;
+            z-index: 1001;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid white;
+        }
+
+        .btn-esterilizar {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-esterilizar:hover {
+            transform: scale(1.2);
+        }
+
+        .btn-est-rojo {
+            background: #e74c3c;
+        }
+
+        .btn-est-verde {
+            background: #2ecc71;
+        }
+
+        .btn-est-azul {
+            background: #3498db;
+        }
+
+        .btn-est-amarillo {
+            background: #f1c40f;
+        }
+
+        @keyframes pulseBtn {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #alert-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            border: 1px solid var(--accent);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            z-index: 5000;
+        }
+
+        /* FIXED MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 10000;
+            display: none;
+            /* OCULTO POR DEFECTO */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.activo {
+            display: flex;
+            /* SOLO VISIBLE CON CLASE ACTIVO */
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-box {
+            background: #1e1e2e;
+            color: #fff;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 12px;
+            border: 1px solid #444;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: #2b2b3b;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #a6e3a1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #bbb;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            line-height: 1.6;
+            font-size: 1rem;
+            color: #cdd6f4;
+            text-align: left;
+        }
+
+        .carta-glosario {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .carta-glosario .icono {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 50px;
+            text-align: center;
+        }
+
+        #pantalla-ganador {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            color: white;
+            text-align: center;
+        }
+
+        .ganador-contenido {
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px;
+            width: 160px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: gold;
+        }
+
+        .clasificacion-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        .tablero-jugador.abandonando {
+            animation: shakeAndExplode 1.5s forwards;
+        }
+
+        @keyframes shakeAndExplode {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                filter: hue-rotate(0deg);
+                opacity: 1;
+            }
+
+            20% {
+                transform: translate(-10px, 0) rotate(-5deg);
+                filter: hue-rotate(90deg) contrast(1.5);
+            }
+
+            40% {
+                transform: translate(10px, 0) rotate(5deg);
+                filter: hue-rotate(180deg) contrast(2);
+            }
+
+            60% {
+                transform: scale(1.1) rotate(-5deg);
+                filter: invert(1);
+                opacity: 0.8;
+            }
+
+            80% {
+                transform: scale(1.2) rotate(5deg);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(2);
+                opacity: 0;
+                display: none;
+            }
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-lobby {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .btn-lobby:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
     </style>
 </head>
+
 <body>
-    <div id="flash-screen"></div>
-    
-    <div id="modal-reglas" class="modal-overlay oculto">
+    <div class="bg-anim" id="bg-anim"></div>
+    <!-- Confetti Global -->
+    <canvas id="confetti-canvas"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index: 4000;"></canvas>
+
+    <div id="flash-screen"
+        style="position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:100000; transition:opacity 0.5s; opacity:0;">
+    </div>
+    <div id="alert-box">¡Copiado!</div>
+
+    <div id="modal-reglas" class="modal-overlay">
         <div class="modal-box">
-            <span class="modal-close" onclick="toggleModal('modal-reglas')">&times;</span>
-            <h2 class="modal-h2">📜 Reglas del Juego</h2>
-            <p>1. <b>Objetivo:</b> Tener 4 órganos sanos de diferente color en tu cuerpo.</p>
-            <p>2. <b>Turno:</b> Juega una carta o descarta. Siempre robas hasta tener 3.</p>
-            <p>3. <b>Órganos:</b> Solo puedes tener uno de cada color. El multicolor sirve de comodín.</p>
-            <p>4. <b>Virus:</b> Infecta órganos rivales. 2 virus destruyen el órgano.</p>
-            <p>5. <b>Medicinas:</b> Curan virus o protegen órganos. 2 medicinas inmunizan (escudo permanente).</p>
+            <div class="modal-header">
+                <h2>📜 Reglamento</h2><button class="modal-close" onclick="toggleReglas()">×</button>
+            </div>
+            <div class="modal-body">
+                <p><b>Objetivo:</b> Consigue un cuerpo con 4 órganos sanos de diferente color (❤️💛💚💙).</p>
+                <p><b>Turno:</b> Tienes 3 cartas. Juega una o descarta las que quieras. Al final, robas hasta tener 3.
+                </p>
+                <hr style="border-color:rgba(255,255,255,0.1)">
+                <p><b>Tipos de Cartas:</b></p>
+                <ul>
+                    <li><b>Órgano:</b> Se juegan en TU cuerpo.</li>
+                    <li><b>Virus:</b> Infectan órganos rivales o destruyen medicinas.</li>
+                    <li><b>Medicina:</b> Curan virus o vacunan (protegen) órganos.</li>
+                    <li><b>Tratamientos:</b> Modifican el juego (robos, cambios, etc).</li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <div id="modal-cartas" class="modal-overlay oculto">
+    <!-- MODAL INDICE -->
+    <div id="modal-indice" class="modal-overlay">
         <div class="modal-box">
-            <span class="modal-close" onclick="toggleModal('modal-cartas')">&times;</span>
-            <h2 class="modal-h2">🃏 Índice de Cartas</h2>
-            <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
-                <div class="carta-demo">🤝 <b>Trasplante:</b> Intercambia un órgano tuyo por uno rival.</div>
-                <div class="carta-demo">🦹 <b>Ladrón:</b> Roba un órgano que te falte.</div>
-                <div class="carta-demo">☣️ <b>Contagio:</b> Pasa tus virus a los demás.</div>
-                <div class="carta-demo">🧤 <b>Guante:</b> Todos descartan su mano.</div>
-                <div class="carta-demo">🔁 <b>Error Médico:</b> Cambia todo tu cuerpo con otro.</div>
+            <div class="modal-header">
+                <h2>📖 Índice de Cartas</h2><button class="modal-close" onclick="toggleIndice()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="carta-glosario">
+                    <div class="icono">❤️</div>
+                    <div><b>Órgano</b><span>Base del cuerpo. Necesitas 4 distintos.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono" style="color:red">🦠</div>
+                    <div><b>Virus</b><span>Infecta órganos o rompe vacunas. 2 virus = extirpado.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono" style="color:cyan">💊</div>
+                    <div><b>Medicina</b><span>Cura o vacuna. 2 medicinas = inmunizado.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">🌈</div>
+                    <div><b>Multicolor</b><span>Comodín para órgano, virus o medicina.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">🔁</div>
+                    <div><b>Trasplante</b><span>Cambia un órgano tuyo por uno de un rival.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">🦹</div>
+                    <div><b>Ladrón</b><span>Roba un órgano de otro y póntelo tú.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">☣️</div>
+                    <div><b>Contagio</b><span>Pasa tus virus a los demás.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">🧤</div>
+                    <div><b>Guante</b><span>Todos descartan su mano.</span></div>
+                </div>
+                <div class="carta-glosario">
+                    <div class="icono">🩺</div>
+                    <div><b>Error Médico</b><span>Cambia TODO tu cuerpo con otro jugador.</span></div>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="vista-menu">
-        <h1 style="font-size: 6rem; text-shadow: 0 0 30px #e74c3c; margin-bottom: 30px; letter-spacing: 5px;">VIRUS</h1>
+        <h1 style="font-size: 6rem; text-shadow: 0 0 20px #e74c3c; margin-top: 40px;">VIRUS</h1>
         <div class="caja-menu">
-            <input type="text" id="input-nombre-menu" placeholder="Tu Nombre" maxlength="10">
-            <button class="btn-crear" onclick="crearSala()">👑 CREAR SALA</button>
-            <div style="margin: 15px 0; border-top: 1px solid rgba(255,255,255,0.3);"></div>
-            <input type="text" id="input-codigo-menu" placeholder="Código de Sala" maxlength="6">
-            <button class="btn-unir" onclick="unirseSala()">🚀 UNIRSE</button>
-            <div style="margin-top:20px;">
-                <button class="btn-info" onclick="toggleModal('modal-reglas')">📜 REGLAS</button>
-                <button class="btn-info" onclick="toggleModal('modal-cartas')">🃏 CARTAS</button>
-            </div>
+            <input type="text" id="input-nombre-menu" placeholder="Tu Nombre">
+            <button onclick="crearSala()" class="btn-crear">CREAR SALA</button>
+            <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.2);"></div>
+            <input type="text" id="input-codigo-menu" placeholder="Código">
+            <button onclick="unirseSala()" class="btn-unir">UNIRSE</button>
+            <br><button class="btn-info" onclick="toggleReglas()">📜 REGLAS</button>
         </div>
     </div>
 
     <div id="vista-lobby" class="oculto">
-        <h2 style="margin:0; color:#ddd; margin-bottom:10px;">CÓDIGO DE SALA:</h2>
-        <div class="codigo-sala" id="lobby-codigo" onclick="copiarCodigo()">------</div>
-        <div class="caja-menu" style="width: 100%; max-width: 600px;">
-            <div class="lista-jugadores" id="lobby-lista"></div>
-            <button id="btn-listo" onclick="toggleListo()" style="background:#e67e22; margin-top:20px;">ESTOY LISTO</button>
-            <button id="btn-iniciar" onclick="iniciarPartida()" style="background:#8e44ad; display:none; box-shadow: 0 0 20px #8e44ad;">¡INICIAR PARTIDA!</button>
-            <div style="margin-top:20px; color:#e74c3c; cursor:pointer; text-decoration:underline;" onclick="location.reload()">Salir</div>
+        <div class="caja-menu" style="width: 450px; padding: 40px;">
+            <div style="font-size: 0.9rem; color: #aaa; margin-bottom: 5px;">CÓDIGO DE SALA</div>
+            <div id="lobby-codigo" onclick="copiarCodigo()"
+                style="font-size: 3.5rem; color: #f1c40f; font-weight: bold; letter-spacing: 2px; cursor: pointer; margin-bottom: 30px; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3);"
+                title="Click para copiar">
+                ---
+            </div>
+
+            <div id="lobby-lista"
+                style="text-align: left; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; min-height: 100px;">
+            </div>
+
+            <button id="btn-listo" onclick="toggleListo()" style="background:#e67e22; margin-top: 20px;">ESTOY
+                LISTO</button>
+            <button id="btn-iniciar" onclick="iniciarPartida()"
+                style="background:#8e44ad; display:none; box-shadow: 0 0 20px #8e44ad;">¡INICIAR PARTIDA!</button>
+
+            <div id="lobby-feedback" style="color: #aaa; margin-top: 10px; font-size: 0.9rem;"></div>
+            <div style="margin-top:20px; cursor:pointer; text-decoration:underline; color: #e74c3c;"
+                onclick="location.reload()">Salir</div>
         </div>
     </div>
 
     <div id="vista-juego" class="oculto">
         <div id="zona-central">
             <div class="mazo-slot" id="visual-mazo">MAZO<br><span id="count-mazo">0</span></div>
-            <div style="flex-grow:1; text-align:center;">
-                <div id="info-turno">...</div>
-                <div id="accion-log">...</div>
+            <div id="accion-log">Esperando...</div>
+            <div class="mazo-slot" id="slot-basura"><small>Basura</small>
+                <div id="ultima-descartada"></div>
             </div>
-            <div class="mazo-slot" style="background:transparent; border:2px dashed #7f8c8d;"><small>Basura</small><div id="ultima-descartada"></div></div>
         </div>
         <div id="mesa" class="mesa-container"></div>
         <div id="panel-inferior">
-            <div>
-                <button id="btn-toggle-basura" class="btn-accion btn-descartar" onclick="toggleModoBasura()">🗑️ DESCARTAR</button>
-                <button id="btn-confirmar-basura" class="btn-accion btn-confirmar" onclick="enviarDescarte()">CONFIRMAR</button>
+            <button id="btn-jugar-especial" onclick="usarCartaEspecial()">⚡ UTILIZAR CARTA</button>
+
+            <div id="panel-esterilizacion">
+                <button class="btn-esterilizar btn-est-rojo" onclick="usarEsterilizacion('rojo')">❤️</button>
+                <button class="btn-esterilizar btn-est-verde" onclick="usarEsterilizacion('verde')">🥩</button>
+                <button class="btn-esterilizar btn-est-azul" onclick="usarEsterilizacion('azul')">🧠</button>
+                <button class="btn-esterilizar btn-est-amarillo" onclick="usarEsterilizacion('amarillo')">🦴</button>
+            </div>
+
+            <div class="botones-container">
+                <button id="btn-toggle-basura" class="btn-accion btn-descartar" onclick="toggleModoBasura()">🗑️
+                    DESCARTAR</button>
+                <button id="btn-confirmar-basura" class="btn-accion btn-confirmar"
+                    onclick="enviarDescarte()">CONFIRMAR</button>
             </div>
             <div id="mis-cartas"></div>
         </div>
     </div>
 
-    <div id="overlay-aviso" class="oculto"><div id="texto-aviso"></div><div style="width: 80%; max-width: 400px; background: rgba(255,255,255,0.2); border-radius: 5px;"><div id="barra-progreso"></div></div></div>
-    
-    <div id="pantalla-ganador" class="oculto">
-        <div class="ganador-contenedor" id="anim-ganador-box">
-            <h1 class="texto-victoria-grande">¡VICTORIA!</h1>
-            <div class="copa-victoria">🏆</div>
-            <h2 id="texto-ganador" style="color: white; font-size:3rem; margin-top:10px;"></h2>
-            
-            <div class="stats-container" id="stats-area"></div>
-
-            <div class="lista-final-jugadores" id="lista-final">
-                </div>
-
-            <div style="display:flex; gap:20px; margin-top:20px;">
-                <button class="btn-crear" onclick="pedirRevancha()">✅ ¡LISTO PARA REVANCHA!</button>
-                <button class="btn-volver" onclick="volverAlLobby()">🏠 VOLVER A LA SALA</button>
+    <div id="pantalla-ganador" class="oculto" style="z-index: 2000;">
+        <div class="ganador-contenido" id="anim-ganador-box" style="z-index: 10002; position: relative;">
+            <h1 style="color:gold; font-size:4rem; margin-bottom:10px;">¡VICTORIA!</h1>
+            <div style="font-size: 5rem;">🏆</div>
+            <h2 id="texto-ganador" style="color:white; font-size: 2.5rem; margin: 10px 0;"></h2>
+            <div id="stats-container"
+                style="display:flex; gap:10px; justify-content:center; margin-top:20px; flex-wrap:wrap; color:white;">
+            </div>
+            <div class="clasificacion-lista" id="lista-clasificacion"
+                style="text-align: left; margin: 20px 0; width: 100%; color: white;"></div>
+            <div style="display:flex; gap:20px; justify-content:center; margin-top:30px;">
+                <button onclick="pedirRevancha()"
+                    style="background:gold; color:black; font-size:1.2rem; padding:12px 30px; border-radius:50px; font-weight:bold;">REVANCHA</button>
+                <button onclick="volverAlLobby()"
+                    style="background:#3498db; color:white; font-size:1.2rem; padding:12px 30px; border-radius:50px; font-weight:bold;">VOLVER
+                    A SALA</button>
+                <button onclick="location.reload()"
+                    style="background:#555; color:white; font-size:1.2rem; padding:12px 30px; border-radius:50px; font-weight:bold;">SALIR</button>
             </div>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script>
         const socket = io();
-        let miId=null, soyLider=false, enLobby=false, modoBasura=false, seleccionadas=[], datosManoLocal=[], jugadoresLocal={}, miTurno=false;
-        let cartasAnimadas = new Set(); 
+        let miId = null, soyLider = false, enLobby = false, modoBasura = false, seleccionadas = [], datosManoLocal = [], jugadoresLocal = {}, miTurno = false;
+        let cartasAnimadas = new Set(); let selectedUid = null, selectedDom = null;
 
-        const NOMBRES = { 'rojo': 'Corazón', 'verde': 'Estómago', 'azul': 'Cerebro', 'amarillo': 'Hueso', 'multicolor': 'Multi' };
-        const EMOJIS_DISPONIBLES = ['😎', '🤡', '👽', '🤖', '👻', '🤠', '🎃', '😈', '🐱', '🦄', '💩', '🦖'];
-        
+        const NOMBRES = { 'rojo': 'Corazón', 'verde': 'Estómago', 'azul': 'Cerebro', 'amarillo': 'Hueso', 'multicolor': 'Comodín', 'virus': 'Virus', 'medicina': 'Medicina', 'error': 'Error Médico', 'guante': 'Guante', 'ladron': 'Ladrón', 'contagio': 'Contagio', 'trasplante': 'Trasplante', 'esterilizacion': 'Esterilización' };
         const DESCRIPCIONES = {
-            'trasplante': 'Intercambia tu órgano por uno rival del mismo color.',
-            'ladron': 'Roba un órgano ajeno que te falte.',
-            'contagio': 'Propaga tus virus a órganos sanos rivales.',
-            'guante': 'Obliga a todos a descartar su mano.',
-            'error': 'Intercambia todo tu cuerpo con un rival.',
-            'organo': 'Sano', 'virus': 'Virus', 'medicina': 'Medicina'
+            'esterilizacion': 'Elige un color (órgano). Se eliminan TODOS los virus de ese color en TODA la mesa.',
+            'trasplante': 'Intercambia un órgano no inmune tuyo por uno rival.',
+            'ladron': 'Roba un órgano no inmune que te falte.',
+            'contagio': 'Pasa tus virus a los demás.',
+            'guante': 'Todos descartan su mano.', 'error': 'Intercambia cuerpo.', 'organo': 'Sano', 'virus': 'Infectar', 'medicina': 'Curar'
         };
+        const ICONS = ['🦠', '💊', '💉', '🩸', '🧪'];
 
-        function toggleModal(id){ const el=document.getElementById(id); el.classList.toggle('oculto'); }
-        function crearSala(){ let n=document.getElementById('input-nombre-menu').value; if(n) socket.emit('crearSala',n); }
-        function unirseSala(){ let n=document.getElementById('input-nombre-menu').value, c=document.getElementById('input-codigo-menu').value; if(n&&c) socket.emit('unirseSala',{codigo:c, nombre:n}); }
-        function copiarCodigo(){ navigator.clipboard.writeText(document.getElementById('lobby-codigo').innerText); alert("Copiado"); }
-        function toggleListo(){ socket.emit('jugadorListo'); }
-        function iniciarPartida(){ socket.emit('iniciarPartida'); }
-        function volverAlLobby(){ socket.emit('volverAlLobby'); }
-        function expulsar(id){ socket.emit('expulsarJugador', id); }
-        function pedirRevancha(){ socket.emit('solicitarRevancha'); document.querySelector('button[onclick="pedirRevancha()"]').style.background='#7f8c8d'; document.querySelector('button[onclick="pedirRevancha()"]').innerText='Esperando...'; }
-        
-        function cambiarEmoji(val) { socket.emit('cambiarEmoji', val); }
+        const bg = document.getElementById('bg-anim');
+        for (let i = 0; i < 25; i++) {
+            let el = document.createElement('div'); el.className = 'floater'; el.innerText = ICONS[Math.floor(Math.random() * ICONS.length)];
+            el.style.left = Math.random() * 100 + 'vw'; el.style.animationDuration = (15 + Math.random() * 15) + 's'; el.style.animationDelay = (Math.random() * -20) + 's';
+            bg.appendChild(el);
+        }
 
-        socket.on('salaUnida', (c)=>{ document.getElementById('vista-menu').classList.add('oculto'); document.getElementById('vista-lobby').classList.remove('oculto'); document.getElementById('vista-juego').classList.add('oculto'); document.getElementById('pantalla-ganador').classList.add('oculto'); document.getElementById('lobby-codigo').innerText=c; enLobby=true; });
+        // TOOLTIPS FLOTANTES
+        const tooltip = document.createElement('div');
+        tooltip.id = 'custom-tooltip';
+        Object.assign(tooltip.style, {
+            position: 'fixed', padding: '10px', background: 'rgba(0,0,0,0.9)', color: 'white',
+            borderRadius: '8px', border: '1px solid gold', pointerEvents: 'none',
+            zIndex: '999999', display: 'none', maxWidth: '200px', fontSize: '0.9rem', textAlign: 'center'
+        });
+        document.body.appendChild(tooltip);
+
+        function showTooltip(e, text) {
+            tooltip.innerHTML = text;
+            tooltip.style.display = 'block';
+            moveTooltip(e);
+        }
+        function moveTooltip(e) {
+            // FIX: Arriba del cursor para que no lo tape la pantalla
+            // 15px de margen + altura del tooltip (aprox)
+            let ttHeight = tooltip.offsetHeight || 100;
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY - ttHeight - 20) + 'px';
+        }
+        function hideTooltip() { tooltip.style.display = 'none'; }
+
+        function toggleReglas() {
+            let el = document.getElementById('modal-reglas');
+            el.classList.toggle('activo');
+        }
+        function toggleIndice() {
+            let el = document.getElementById('modal-indice');
+            el.classList.toggle('activo');
+        }
+
+        function crearSala() { let n = document.getElementById('input-nombre-menu').value; if (n) socket.emit('crearSala', n); }
+        function unirseSala() { let n = document.getElementById('input-nombre-menu').value, c = document.getElementById('input-codigo-menu').value; if (n && c) socket.emit('unirseSala', { codigo: c, nombre: n }); }
+        function copiarCodigo() { navigator.clipboard.writeText(document.getElementById('lobby-codigo').innerText); let a = document.getElementById('alert-box'); a.innerText = "¡Copiado!"; a.style.opacity = 1; setTimeout(() => a.style.opacity = 0, 1500); }
+        function toggleListo() { socket.emit('jugadorListo'); }
+        function iniciarPartida() { socket.emit('iniciarPartida'); }
+        function volverAlLobby() { socket.emit('volverAlLobby'); }
+        function pedirRevancha() { socket.emit('solicitarRevancha'); }
+        function cambiarEmoji(v) { socket.emit('cambiarEmoji', v); }
+
+        socket.on('salaUnida', (c) => {
+            document.getElementById('vista-menu').classList.add('oculto');
+
+            // CLEANUP & SHOW LOBBY
+            if (window.confettiInterval) clearInterval(window.confettiInterval);
+            let lobby = document.getElementById('vista-lobby');
+            lobby.classList.remove('oculto');
+            lobby.style.display = 'block'; // Force show (override potential hard hide)
+
+            document.getElementById('vista-juego').classList.add('oculto'); // Prevent overlap
+
+            // FIX: Remove turn border and cleanup flash screen
+            document.body.classList.remove('mi-turno-borde');
+            let flash = document.getElementById('flash-screen');
+            if (flash) { flash.style.display = 'none'; flash.style.opacity = 0; }
+
+            document.getElementById('lobby-codigo').innerText = c;
+
+            // FIX: Hide victory screen if coming from there
+            let pg = document.getElementById('pantalla-ganador');
+            pg.classList.add('oculto');
+            pg.style.display = 'none';
+
+            enLobby = true;
+        });
         socket.on('errorSala', alert);
-        socket.on('expulsado', ()=>{ alert("Has sido expulsado de la sala."); location.reload(); });
-        
+        socket.on('expulsado', () => { alert("Expulsado"); location.reload(); });
+        socket.on('juegoIniciado', () => {
+            cartasAnimadas.clear();
+
+            // FIX: Use class for !important hiding power
+            let vm = document.getElementById('vista-menu');
+            vm.classList.add('oculto');
+            vm.style.display = 'none';
+
+            let vl = document.getElementById('vista-lobby');
+            vl.classList.add('oculto');
+            vl.style.display = 'none';
+
+            document.getElementById('vista-juego').classList.remove('oculto');
+            document.getElementById('panel-inferior').style.display = 'flex'; // Restore panel
+            document.getElementById('pantalla-ganador').classList.add('oculto');
+            enLobby = false;
+        });
+        socket.on('mano', (c) => { datosManoLocal = c; if (!enLobby) renderizarMano(); });
+
         socket.on('jugadorSalio', (data) => {
-            const tablero = document.querySelector(`.jugador-tablero[data-pid="${data.id}"]`);
-            if (tablero) {
-                tablero.classList.add('anim-desaparicion');
-                const accionLog = document.getElementById('accion-log');
-                if(accionLog) accionLog.innerText = `${data.nombre} se desconectó 🔌`;
+            let f = document.getElementById('flash-screen'); f.style.background = 'radial-gradient(circle, transparent, rgba(255,0,0,0.5))'; f.style.opacity = 1; setTimeout(() => f.style.opacity = 0, 500);
+            let a = document.getElementById('alert-box'); a.innerText = `${data.nombre} salió.`; a.style.background = 'rgba(200,0,0,0.8)'; a.style.opacity = 1; setTimeout(() => { a.style.opacity = 0; a.style.background = 'rgba(0,0,0,0.8)'; }, 3000);
+        });
+
+        socket.on('notificacion', (d) => {
+            // Feedback visual claro
+            let a = document.getElementById('alert-box');
+            if (a) {
+                a.innerHTML = d.mensaje || d;
+                a.style.background = 'rgba(231, 76, 60, 0.9)'; // Red warning
+                a.style.boxShadow = '0 0 15px red';
+                a.style.opacity = 1;
+                setTimeout(() => { a.style.opacity = 0; }, 3000);
+            } else {
+                alert(d.mensaje || d);
             }
         });
 
-        socket.on('juegoIniciado', ()=>{ 
-            cartasAnimadas.clear(); 
-            // Resetear boton revancha
-            const btnR = document.querySelector('button[onclick="pedirRevancha()"]');
-            if(btnR) { btnR.style.background=''; btnR.innerText='✅ ¡LISTO PARA REVANCHA!'; }
-            document.getElementById('vista-lobby').classList.add('oculto'); document.getElementById('vista-juego').classList.remove('oculto'); document.getElementById('pantalla-ganador').classList.add('oculto'); enLobby=false; 
+        socket.on('jugadorAbandono', (data) => {
+            // Animación de Abandono Sutil
+            let tablero = document.getElementById(`tablero-${data.id}`);
+            if (tablero) {
+                tablero.classList.add('abandonando');
+            }
+            // Log estandar
+            logEvento(`🚪 ${data.nombre} salió de la partida`);
         });
-        socket.on('notificacion', (msg)=>{ if(msg.includes('reciclado')){ let m=document.getElementById('visual-mazo'); m.classList.add('mazo-reciclado'); setTimeout(()=>m.classList.remove('mazo-reciclado'),1000); } });
 
-        socket.on('actualizarEstado', (data) => {
-            const { jugadores, lider, turno, nombreTurno, evento, logTexto, mazoCount, ultimaDescartada, juegoTerminado, ganador, avisoEspecial, stats } = data;
-            jugadoresLocal = jugadores; miId = socket.id; soyLider = (miId === lider);
+        socket.on('actualizarEstado', (d) => {
+            const { jugadores, lider, turno, logTexto, mazoCount, ultimaDescartada, isSpecialLog, evento, juegoTerminado, ganador, stats } = d;
+            if (Array.isArray(jugadores)) { jugadoresLocal = {}; jugadores.forEach(j => jugadoresLocal[j.id] = j); } else jugadoresLocal = jugadores;
 
-            if(enLobby) {
-                const lista = document.getElementById('lobby-lista'); lista.innerHTML = ''; let ready=0, total=0;
-                Object.values(jugadores).forEach(j => {
-                    total++; if(j.listo) ready++;
-                    let botonEchar = (soyLider && j.id !== miId) ? `<button class="btn-kick" onclick="expulsar('${j.id}')">❌</button>` : '';
-                    
-                    // SELECTOR DE EMOJI
-                    let emojiDisplay = '';
-                    if(j.id === miId) {
-                        let opts = EMOJIS_DISPONIBLES.map(e => `<option value="${e}" ${j.emoji===e?'selected':''}>${e}</option>`).join('');
-                        emojiDisplay = `<select class="emoji-select" onchange="cambiarEmoji(this.value)">${opts}</select>`;
-                    } else {
-                        emojiDisplay = `<span style="font-size:1.5rem; margin-right:5px;">${j.emoji}</span>`;
-                    }
+            // ... resto del update
+            miId = socket.id; soyLider = (miId === lider);
 
-                    lista.innerHTML += `<div class="item-jugador"><div>${j.id===lider?'👑':''} ${emojiDisplay} ${j.nombre}</div><div style="display:flex; align-items:center; gap:10px;"><div class="${j.listo?'estado-listo':''}">${j.listo?'LISTO':'...'}</div>${botonEchar}</div></div>`;
-                    if(j.id===miId) { let b=document.getElementById('btn-listo'); b.innerText=j.listo?"¡ESTOY LISTO!":"ESTOY LISTO"; b.style.background=j.listo?"#27ae60":"#e67e22"; }
+            if (enLobby) {
+                const l = document.getElementById('lobby-lista'); l.innerHTML = ''; let ready = 0; const total = Object.keys(jugadoresLocal).length;
+                Object.values(jugadoresLocal).forEach(j => {
+                    if (j.listo) ready++;
+                    let extra = (j.id === miId) ? `<select onchange="cambiarEmoji(this.value)" class="emoji-select">${['😎', '🤠', '😈', '🤖', '👽', '👻', '💩', '🤡', '👺', '🦄', '🐲', '🐹', '🍕', '🚗', '🚀'].map(e => `<option ${j.emoji === e ? 'selected' : ''}>${e}</option>`).join('')}</select>` : j.emoji;
+                    // FIX BOTON X
+                    let kickBtn = (soyLider && j.id !== miId) ? `<button class="btn-kick" onclick="socket.emit('expulsarJugador','${j.id}')">X</button>` : '';
+                    l.innerHTML += `<div style="margin:5px 0; background:rgba(0,0,0,0.3); padding:10px; border-radius:10px; display:flex; justify-content:space-between; align-items:center;"><div>${extra} <span style="margin-left:5px">${j.nombre}</span></div><div style="display:flex; align-items:center;"><span style="color:${j.listo ? 'lime' : 'orange'}; font-weight:bold;">${j.listo ? 'LISTO' : '...'}</span>${kickBtn}</div></div>`;
                 });
-                document.getElementById('btn-iniciar').style.display = (soyLider && total>=2 && ready===total) ? 'block' : 'none';
+                document.getElementById('btn-iniciar').style.display = (soyLider && total >= 2 && ready === total) ? 'inline-block' : 'none';
                 return;
             }
 
             miTurno = (turno === miId);
-            const infoT = document.getElementById('info-turno');
-            infoT.innerText = miTurno ? "¡TU TURNO!" : `Juega: ${nombreTurno}`;
-            infoT.style.color = miTurno ? '#2ecc71' : '#f1c40f';
-            document.getElementById('accion-log').innerText = logTexto || "Jugando...";
+            if (miTurno) document.body.classList.add('mi-turno-borde'); else document.body.classList.remove('mi-turno-borde');
+            const logEl = document.getElementById('accion-log');
+            logEl.innerHTML = logTexto;
+            if (isSpecialLog) logEl.classList.add('log-special'); else logEl.classList.remove('log-special');
 
-            const av=document.getElementById('overlay-aviso'), bar=document.getElementById('barra-progreso');
-            if(avisoEspecial){ av.classList.remove('oculto'); document.getElementById('texto-aviso').innerText=avisoEspecial; bar.style.width='0%'; setTimeout(()=>bar.style.width='100%',100); }
-            else { av.classList.add('oculto'); bar.style.width='0%'; }
+            if (juegoTerminado) {
+                let pg = document.getElementById('pantalla-ganador');
+                pg.classList.remove('oculto');
+                pg.style.display = 'flex'; // Force flex via JS only when needed
+                pg.style.flexDirection = 'column';
+                document.getElementById('panel-inferior').style.display = 'none'; // Hide hand
 
-            // --- ANIMACIÓN VICTORIA ÉPICA ---
-            if(juegoTerminado) { 
-                const pg = document.getElementById('pantalla-ganador');
-                if(pg.classList.contains('oculto')) {
-                    pg.classList.remove('oculto'); 
-                    document.getElementById('texto-ganador').innerText=ganador;
-                    document.getElementById('panel-inferior').style.display='none'; 
-                    
-                    // Renderizar Stats
-                    const statsBox = document.getElementById('stats-area');
-                    statsBox.innerHTML = '';
-                    if(stats && stats.length > 0) {
-                        stats.forEach(s => {
-                            statsBox.innerHTML += `<div class="stat-card"><div style="font-size:2rem">${s.titulo.split(' ')[0]}</div><div>${s.titulo.split(' ').slice(1).join(' ')}</div><div style="font-weight:bold;color:#f1c40f">${s.jugador}: ${s.valor}</div><div style="font-size:0.8rem">${s.desc}</div></div>`;
-                        });
-                        setTimeout(() => { document.getElementById('anim-ganador-box').classList.add('ganador-subir'); }, 2000);
-                    }
+                document.getElementById('texto-ganador').innerHTML = `<span style="font-size:1.5rem; display:block; margin-bottom:10px; color:#aaa;">GANADOR DE LA RONDA</span>${ganador}`;
+
+                const statsCont = document.getElementById('stats-container'); statsCont.innerHTML = '';
+                if (stats && stats.length > 0) {
+                    stats.forEach(s => {
+                        statsCont.innerHTML += `
+                        <div class="stat-card">
+                            <div style="font-size:2rem; margin-bottom:5px;">${s.titulo.split(' ')[0]}</div>
+                            <div style="font-weight:bold; color:#f1c40f; font-size:1.1rem;">${s.titulo.split(' ').slice(1).join(' ')}</div>
+                            <div style="font-weight:bold; color:white; margin:5px 0;">${s.jugador}</div>
+                            <div style="font-size:0.8rem; color:#ccc;">${s.desc}</div>
+                        </div>`;
+                    });
                 }
-                // Renderizar Lista Final con Emojis
-                const listaFinal = document.getElementById('lista-final');
-                listaFinal.innerHTML = '';
-                Object.values(jugadores).forEach(j => {
-                    let marca = j.revancha ? '<span class="tick-verde">✅</span>' : '⏳';
-                    listaFinal.innerHTML += `<div class="item-final"><div>${j.emoji} ${j.nombre}</div><div>${marca}</div></div>`;
+                const listaClasif = document.getElementById('lista-clasificacion'); listaClasif.innerHTML = '<h3 style="border-bottom:1px solid #555; padding-bottom:5px;">Clasificación Final & Sala</h3>';
+                Object.values(jugadoresLocal).sort((a, b) => b.organosSanos - a.organosSanos).forEach((j, i) => {
+                    let isWinner = (j.nombre === ganador);
+                    listaClasif.innerHTML += `
+                    <div class="clasificacion-item" style="${isWinner ? 'background:rgba(255,215,0,0.2); border:1px solid gold;' : ''}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:1.5rem; width:40px;">${i === 0 ? '🥇' : (i === 1 ? '🥈' : '🥉')}</span>
+                            <div>
+                                <div style="font-weight:bold; font-size:1.2rem; color:${isWinner ? 'gold' : 'white'}">${j.nombre}</div>
+                                <div style="font-size:0.8rem; color:#aaa;">Victorias Totales: ${j.victorias}</div>
+                                <div style="font-size:0.7rem; color:${j.revancha ? 'lime' : 'orange'};">${j.revancha ? 'LISTO PARA REVANCHA' : 'ESPERANDO...'}</div>
+                            </div>
+                        </div>
+                        <div style="font-size:1.2rem; font-weight:bold;">
+                            ${j.organosSanos} <span style="font-size:1rem;">Órganos</span>
+                        </div>
+                    </div>`;
                 });
 
-            } else { 
-                document.getElementById('panel-inferior').style.display='flex';
-                document.getElementById('anim-ganador-box').classList.remove('ganador-subir');
+                // Limpiar confetti previo y lanzar loop
+                if (window.confettiInterval) clearInterval(window.confettiInterval);
+                // Limpiar confetti previo y lanzar loop
+                if (window.confettiInterval) clearInterval(window.confettiInterval);
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 }, zIndex: 4000 });
+                window.confettiInterval = setInterval(() => {
+                    confetti({ particleCount: 100, spread: 80, origin: { y: 0.7 }, startVelocity: 30, zIndex: 4000 });
+                }, 3000);
+            } else {
+                if (window.confettiInterval) clearInterval(window.confettiInterval);
             }
 
             const mesa = document.getElementById('mesa'); mesa.innerHTML = '';
-            const numJugadores = Object.values(jugadores).length;
-            mesa.className = 'mesa-container'; 
-            if(numJugadores >= 3) mesa.classList.add('mesa-peque');
-            if(numJugadores >= 5) mesa.classList.add('mesa-mini');
-
-            Object.values(jugadores).forEach(j => {
+            Object.values(jugadoresLocal).forEach(j => {
                 let div = document.createElement('div');
-                div.className = `jugador-tablero ${turno===j.id?'turno-activo':''}`;
-                div.dataset.pid = j.id;
-                div.innerHTML = `<div style="text-align:center;border-bottom:1px solid rgba(255,255,255,0.2);margin-bottom:8px;font-weight:bold;font-size:1.2rem;">${j.emoji} ${j.nombre}</div><div id="c-${j.id}" style="display:flex;justify-content:center;flex-wrap:wrap;"></div>`;
+                div.className = `jugador-tablero ${turno === j.id ? 'turno-activo' : ''}`;
+                div.id = `tablero-${j.id}`;
+                div.dataset.pid = j.id; // IMPORTANTISIMO PARA TARGETING
+                div.innerHTML = `<div style="text-align:center; font-weight:bold; margin-bottom:5px;">${j.id === miId ? '(YO)' : ''} ${j.emoji} ${j.nombre} 🏆${j.victorias}</div><div id="c-${j.id}" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>`;
                 let cDiv = div.querySelector(`#c-${j.id}`);
                 j.cuerpo.forEach((c, idx) => {
-                    let el = document.createElement('div');
-                    el.className = `carta ${c.color} carta-mesa`;
-                    el.id = `organo-${j.id}-${idx}`; el.dataset.pid = j.id; el.dataset.idx = idx;
-                    let ov = ''; 
-                    if(c.virus>0) ov='<div class="overlay-icon">🦠</div>';
-                    if(c.medicinas===1) ov='<div class="overlay-icon">🛡️</div>';
-                    if(c.medicinas===2) ov='<div class="overlay-icon">🦾</div>';
-                    el.innerHTML = `<div class="icono">${getIcono(c.tipo, c.color, c.efecto)}</div>${ov}`;
+                    let el = document.createElement('div'); el.className = `carta ${c.color} carta-mesa`;
+                    el.id = `organo-${j.id}-${idx}`;
+                    if (c.medicinas === 2) el.classList.add('inmunizado-static');
+                    el.dataset.pid = j.id; el.dataset.idx = idx;
+
+                    let ov = ''; if (c.virus > 0) ov = '🦠'; if (c.medicinas > 0) ov = c.inmunizado ? '🛡️' : '💊';
+                    el.innerHTML = `<div class="icono">${getIcono(c)}</div><div class="nombre-carta">${getNombreCarta(c)}</div><div class="overlay-icon">${ov}</div>`;
+                    el.onclick = () => clickTarget(j.id, idx, el.id);
                     cDiv.appendChild(el);
                 });
                 mesa.appendChild(div);
             });
 
             document.getElementById('count-mazo').innerText = mazoCount;
-            document.getElementById('ultima-descartada').innerHTML = ultimaDescartada ? generarCartaHTML(ultimaDescartada) : '♻️';
-            if(jugadores[miId]) { datosManoLocal = jugadores[miId].mano; renderizarMano(); }
+            // FIX: Pasar objeto completo para que getIcono tenga 'efecto'
+            document.getElementById('ultima-descartada').innerHTML = ultimaDescartada ? `<div class="carta ${ultimaDescartada.color}"><div class="icono">${getIcono(ultimaDescartada)}</div><div class="nombre-carta">${getNombreCarta(ultimaDescartada)}</div></div>` : '♻️';
 
-            if(evento && evento.tipo==='jugada' && evento.animacion) {
-                if(evento.targetId === miId) {
-                    const flash = document.getElementById('flash-screen'); flash.className = ''; void flash.offsetWidth;
-                    if(evento.animacion === 'extirpar') flash.className = 'flash-verde'; 
-                    if(evento.animacion === 'inmunizar') flash.className = 'flash-dorado';
+            if (jugadoresLocal[miId]) renderizarMano();
+
+            if (evento && evento.tipo === 'jugada' && evento.animacion) {
+
+                if (evento.animacion === 'ladron' && evento.actorId) {
+                    // HELPER: Si la carta ya no existe (porque la robé), creamos una Falsa visualmente
+                    let cardEl = document.getElementById(`organo-${evento.targetId}-${evento.organoIndex}`);
+                    let colorRobado = evento.extra ? evento.extra.colorOrgano : 'multicolor';
+                    let tableroRival = document.getElementById(`tablero-${evento.targetId}`);
+
+                    if (!cardEl && tableroRival) {
+                        // Crear carta fake para animar
+                        let fake = document.createElement('div');
+                        fake.className = `carta ${colorRobado} carta-mesa`;
+                        fake.innerHTML = `<div class="icono">${getIcono('organo', colorRobado)}</div>`;
+                        fake.style.position = 'absolute';
+                        fake.style.opacity = '0'; // Invisible, solo para coordenadas
+                        tableroRival.appendChild(fake);
+                        cardEl = fake;
+                    }
+
+                    if (evento.actorId === miId) {
+                        // YO ROBÉ: Carta vuela de rival -> MI TABLERO
+                        let miTablero = document.getElementById(`tablero-${miId}`);
+                        if (cardEl && miTablero) animarVuelo(cardEl, miTablero, () => cardEl.remove()); // Removemos la fake tras llegar
+                    } else if (evento.targetId === miId) {
+                        // ME ROBARON: Carta vuela de mi tablero -> tablero rival
+                        let tableroRival = document.getElementById(`tablero-${evento.actorId}`);
+                        if (cardEl && tableroRival) animarVuelo(cardEl, tableroRival, null);
+                    } else {
+                        // ESPECTADOR: De tablero a tablero
+                        let tableroActor = document.getElementById(`tablero-${evento.actorId}`);
+                        if (cardEl && tableroActor) animarVuelo(cardEl, tableroActor, null);
+                    }
+                } else if (evento.animacion === 'trasplante' && evento.actorId) {
+                    // FIX: Animación Bidireccional CORRECTA
+                    // 1. Carta del Rival (Target) vuela hacia Actor
+                    let cardRival = document.getElementById(`organo-${evento.targetId}-${evento.organoIndex}`);
+                    let tableroActor = document.getElementById(`tablero-${evento.actorId}`);
+
+                    // 2. Carta del Actor (La que dio) vuela hacia Rival
+                    // USAMOS el índice extra que ahora manda el servidor
+                    let miIdx = (evento.extra && evento.extra.miOrganoIndex !== undefined) ? evento.extra.miOrganoIndex : null;
+                    let cardActor = (miIdx !== null) ? document.getElementById(`organo-${evento.actorId}-${miIdx}`) : null;
+                    let tableroRival = document.getElementById(`tablero-${evento.targetId}`);
+
+                    if (cardRival && tableroActor) animarVuelo(cardRival, tableroActor, null);
+                    // Si tenemos la carta exacta del actor, la animamos. Si no (fallback), animamos desde el tablero.
+                    if (cardActor && tableroRival) animarVuelo(cardActor, tableroRival, null);
+                    else if (tableroActor && tableroRival) animarVuelo(tableroActor, tableroRival, null); // Fallback
                 }
-                if(evento.animacion !== 'extirpar') {
-                    setTimeout(() => {
-                        const targetEl = document.getElementById(`organo-${evento.targetId}-${evento.organoIndex}`);
-                        if(targetEl) {
-                            if(evento.animacion === 'infectar' || evento.animacion === 'destruir_vacuna') { targetEl.classList.add('anim-infectar'); crearParticulas(targetEl, 'virus'); }
-                            if(evento.animacion === 'curar') { targetEl.classList.add('anim-curar'); crearParticulas(targetEl, 'cura'); }
-                            if(evento.animacion === 'inmunizar') { targetEl.classList.add('anim-inmunizar'); crearParticulas(targetEl, 'escudo'); }
-                        }
-                    }, 50);
+                setTimeout(() => {
+                    let targetEl = document.getElementById(`organo-${evento.targetId}-${evento.organoIndex}`);
+                    if (targetEl) {
+                        if (evento.animacion.includes('infectar') || evento.animacion.includes('destruir')) crearParticulas(targetEl, 'virus');
+                        if (evento.animacion === 'vacunar' || evento.animacion === 'curar') crearParticulas(targetEl, 'cura');
+                        if (evento.animacion === 'inmunizar') crearParticulas(targetEl, 'escudo');
+                    }
+                    if (evento.animacion === 'extirpar' && evento.targetId === miId) {
+                        // ANIMACION EVOLUCIONADA: SOLO PARA EL AFECTADO
+                        let colorOrg = evento.extra ? evento.extra.colorOrgano : 'multicolor';
+                        let iconoOrg = getIcono('organo', colorOrg);
+                        flashScreenExtirpar(iconoOrg, '🦠');
+                    }
+                    if (evento.animacion === 'inmunizar' && evento.targetId === miId) {
+                        // FLASH INMUNIZAR: SOLO PARA EL AFECTADO
+                        let colorOrg = evento.extra ? evento.extra.colorOrgano : 'multicolor';
+                        let iconoOrg = getIcono('organo', colorOrg);
+                        flashScreenInmunizar(iconoOrg, '🛡️');
+                    }
+                }, 100);
+
+                if (evento.animacion === 'errorMedico') {
+                    // Animación de Cambio de Cuerpos
+                    let nombreActor = (evento.extra && evento.extra.nombreActor) ? evento.extra.nombreActor : 'Jugador';
+                    let nombreTarget = (evento.extra && evento.extra.nombreTarget) ? evento.extra.nombreTarget : 'Rival';
+                    flashScreenErrorMedico(nombreActor, nombreTarget);
+                }
+                if (evento.animacion === 'contagio') {
+                    // Animación de Contagio Masivo
+                    let nombreActor = (evento.extra && evento.extra.nombreActor) ? evento.extra.nombreActor : 'Jugador';
+                    flashScreenContagio(nombreActor);
+                }
+                if (evento.animacion === 'esterilizacion') {
+                    flashScreenEsterilizacion(evento.extra ? evento.extra.colorOrgano : 'multicolor');
+                }
+                if (evento.animacion === 'guante') {
+                    flashScreenGuante();
                 }
             }
         });
 
-        function crearParticulas(elemento, tipo) {
-            const rect = elemento.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            let icono = '✨';
-            if(tipo === 'virus') icono = '🦠'; if(tipo === 'cura') icono = '➕'; if(tipo === 'escudo') icono = '🛡️';
 
-            for(let i=0; i<12; i++) {
-                const p = document.createElement('div'); p.className = 'particula'; p.innerText = icono;
-                p.style.left = centerX + 'px'; p.style.top = centerY + 'px';
-                const angle = Math.random() * Math.PI * 2; const distance = 50 + Math.random() * 80;
-                p.style.setProperty('--tx', Math.cos(angle) * distance + 'px');
-                p.style.setProperty('--ty', Math.sin(angle) * distance + 'px');
-                p.style.animationDelay = Math.random() * 0.2 + 's';
-                document.body.appendChild(p); setTimeout(() => p.remove(), 1100);
-            }
+
+        function flashScreenGuante() {
+            let f = document.getElementById('flash-screen');
+            f.style.background = 'rgba(0,0,0,0.5)';
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center';
+            f.style.opacity = 1;
+            f.innerHTML = `
+                <div style="font-size:15rem; animation: slap 0.5s;">🧤</div>
+                <div style="position:absolute; width:100%; height:100px; background:white; opacity:0; animation: flashWhite 0.2s 0.3s;"></div>
+             `;
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 500); }, 1500);
         }
 
-        function getIcono(t, c, e) {
-            if(t==='tratamiento'){ if(e==='guante')return'🧤'; if(e==='error')return'🔁'; if(e==='ladron')return'🦹'; if(e==='contagio')return'☣️'; if(e==='trasplante')return'🤝'; return'⚡'; }
-            if(t==='organo'){ if(c==='rojo')return'❤️'; if(c==='verde')return'🥩'; if(c==='azul')return'🧠'; if(c==='amarillo')return'🦴'; return'🃏'; }
-            if(t==='virus')return'🦠'; return'💊';
+        function flashScreen(bgStyle, emoji) {
+            let f = document.getElementById('flash-screen');
+            f.style.background = bgStyle;
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center';
+            f.innerHTML = `<div style="font-size:10rem; animation:popIn 0.5s;">${emoji}</div>`;
+            f.style.opacity = 1;
+
+            // Definir keyframe popIn dinamicamente si no existe o usar inline style transition
+            // Usamos un style block temporal si hace falta, o asumimos que popIn es simple scale
+
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 1000);
         }
 
-        function getEtiquetaCarta(c) {
-            if(c.tipo === 'virus') return 'VIRUS';
-            if(c.tipo === 'medicina') return 'MEDICINA';
-            if(c.tipo === 'organo') return NOMBRES[c.color] || 'MULTI';
-            if(c.tipo === 'tratamiento') return c.efecto.toUpperCase().substr(0,5);
-            return '???';
+        function flashScreenExtirpar(iconOrgan, iconVirus) {
+            let f = document.getElementById('flash-screen');
+            f.style.background = 'radial-gradient(circle, transparent, rgba(50, 255, 50, 0.4))';
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center';
+            f.style.opacity = 1;
+
+            // Secuencia HTML
+            f.innerHTML = `
+                <div id="anim-extirpar-container" style="position:relative; width:200px; height:200px; display:flex; align-items:center; justify-content:center;">
+                    <div id="anim-org" style="font-size:8rem; position:absolute; animation: shakeAndFade 0.8s forwards;">${iconOrgan}</div>
+                    <div id="anim-vir" style="font-size:8rem; position:absolute; transform:scale(0); animation: boomIn 0.5s 0.7s forwards;">${iconVirus}</div>
+                    <div id="anim-boom" style="font-size:10rem; position:absolute; color:orange; opacity:0; animation: explosion 0.5s 0.6s;">💥</div>
+                </div>`;
+
+            // Limpieza
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 2000);
         }
 
-        function validarCarta(carta, mano, yo, todosJugadores) {
-            if (!miTurno) return "No es tu turno";
-            if(carta.tipo === 'organo') {
-                if(yo.cuerpo.find(c => c.color === carta.color && c.color !== 'multicolor')) return "Ya tienes este órgano";
-                if(yo.cuerpo.length >= 5) return "Cuerpo lleno";
-                return null;
+        function flashScreenInmunizar(iconOrgan, iconShield) {
+            let f = document.getElementById('flash-screen');
+            f.style.background = 'radial-gradient(circle, transparent, rgba(255, 215, 0, 0.5))';
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center';
+            f.style.opacity = 1;
+
+            f.innerHTML = `
+                <div style="position:relative; width:200px; height:200px; display:flex; align-items:center; justify-content:center;">
+                    <div style="font-size:8rem; position:absolute; animation: organToGold 0.8s forwards;">${iconOrgan}</div>
+                    <div style="font-size:10rem; position:absolute; transform:scale(0); animation: shieldPop 0.6s 0.5s forwards;">${iconShield}</div>
+                    <div style="position:absolute; width:100%; height:100%; border-radius:50%; box-shadow:0 0 50px gold; opacity:0; animation: glowPulse 1s 0.5s;"></div>
+                </div>`;
+
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 2000);
+        }
+
+        function flashScreenErrorMedico(n1, n2) {
+            let f = document.getElementById('flash-screen');
+            f.style.background = 'radial-gradient(circle, transparent, rgba(0, 0, 255, 0.4))';
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center';
+            f.style.opacity = 1;
+
+            f.innerHTML = `
+                <div style="position:relative; width:600px; height:300px; display:flex; align-items:center; justify-content:space-around;">
+                    <div style="text-align:center; animation: swapLeft 1.5s ease-in-out forwards;">
+                        <div style="font-size:6rem;">👤</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:cyan;">${n1}</div>
+                        <div style="color:#aaa;">(Cuerpo Antiguo)</div>
+                    </div>
+                    <div style="font-size:4rem; position:absolute; animation: spinArrows 1.5s infinite linear;">🔄</div>
+                    <div style="text-align:center; animation: swapRight 1.5s ease-in-out forwards;">
+                        <div style="font-size:6rem;">👤</div>
+                        <div style="font-size:1.5rem; font-weight:bold; color:orange;">${n2}</div>
+                        <div style="color:#aaa;">(Cuerpo Antiguo)</div>
+                    </div>
+                </div>
+                <h1 style="position:absolute; bottom:20%; color:white; font-size:3rem; text-shadow:0 0 20px blue; animation: popIn 0.5s;">¡CAMBIO DE CUERPOS!</h1>`;
+
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 3000); // 3s duración
+        }
+
+        function flashScreenContagio() {
+            let f = document.getElementById('flash-screen');
+            f.style.background = 'rgba(0, 50, 0, 0.8)'; // Toxic green fog
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center'; f.style.overflow = 'hidden';
+            f.style.opacity = 1;
+
+            // Generar partículas de virus volando
+            let virusHTML = '';
+            for (let i = 0; i < 20; i++) {
+                let top = Math.random() * 100;
+                let delay = Math.random() * 0.5;
+                let duration = 1 + Math.random();
+                virusHTML += `<div style="position:absolute; left:-10%; top:${top}%; font-size:${2 + Math.random() * 3}rem; animation: windFly ${duration}s ${delay}s linear forwards;">🦠</div>`;
             }
-            if(carta.tipo === 'virus') {
-                let rivalTiene = Object.values(todosJugadores).some(j => j.id !== miId && j.cuerpo.some(o => (o.color === carta.color || o.color === 'multicolor' || carta.color === 'multicolor') && !o.inmunizado));
-                let yoTengoVacunado = yo.cuerpo.some(o => (o.color === carta.color || o.color === 'multicolor' || carta.color === 'multicolor') && o.medicinas > 0 && !o.inmunizado);
-                if(!rivalTiene && !yoTengoVacunado) return "No hay objetivos válidos";
-                return null;
+
+            f.innerHTML = `
+                <div style="position:absolute; left:0; top:40%; font-size:15rem; animation: coughShake 1s infinite;">🌬️</div>
+                ${virusHTML}
+                <div style="z-index:10; font-size:4rem; color:#2ecc71; font-weight:bold; text-shadow:0 0 20px black; animation: popIn 0.5s;">☣️ ¡EPIDEMIA! ☣️</div>
+            `;
+
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 2500);
+        }
+
+        function flashScreenEsterilizacion(color) {
+            let colors = { 'rojo': 'rgba(255,0,0,0.5)', 'verde': 'rgba(0,255,0,0.5)', 'azul': 'rgba(0,0,255,0.5)', 'amarillo': 'rgba(255,255,0,0.5)', 'multicolor': 'rgba(255,255,255,0.5)' };
+            let bg = colors[color] || 'rgba(0,200,255,0.5)';
+            let nombreColor = color.charAt(0).toUpperCase() + color.slice(1);
+
+            let f = document.getElementById('flash-screen');
+            f.style.background = `linear-gradient(to bottom, ${bg}, transparent)`;
+            f.style.display = 'flex'; f.style.alignItems = 'center'; f.style.justifyContent = 'center'; f.style.flexDirection = 'column';
+            f.style.opacity = 1;
+
+            f.innerHTML = `
+                <div style="font-size:10rem; animation: pulseBtn 0.5s infinite;">🧼</div>
+                <div style="font-size:3rem; color:white; font-weight:bold; text-shadow:0 0 10px black; margin-top:20px; animation: popIn 0.5s;">¡ESTERILIZACIÓN!</div>
+                <div style="font-size:2rem; color:white; text-shadow:0 0 5px black;">Limpiando todo lo ${nombreColor}</div>
+                <div style="position:absolute; inset:0; pointer-events:none; background:white; animation: flashWhite 1s forwards;"></div>
+            `;
+
+            // Sonido o efectos extra (bubbles)
+            // Simular burbujas
+            let burbujas = '';
+            for (let i = 0; i < 30; i++) {
+                let left = Math.random() * 100;
+                let delay = Math.random();
+                burbujas += `<div style="position:absolute; left:${left}%; bottom:0; font-size:${1 + Math.random()}rem; animation: floatUp 2s ${delay}s linear forwards;">🫧</div>`;
             }
-            if(carta.tipo === 'medicina') {
-                let tengoOrgano = yo.cuerpo.some(o => (o.color === carta.color || o.color === 'multicolor' || carta.color === 'multicolor') && !o.inmunizado && o.medicinas < 2);
-                if(!tengoOrgano) return "No tienes órgano para curar";
-                return null;
+            f.innerHTML += burbujas;
+
+            setTimeout(() => { f.style.opacity = 0; setTimeout(() => { f.innerHTML = ''; f.style.display = 'none'; }, 1000); }, 2500);
+        }
+
+        // Estilo de animacion popIn
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes popIn { 0%{transform:scale(0);} 50%{transform:scale(1.2);} 100%{transform:scale(1);} }
+            @keyframes shakeAndFade { 
+                0% { transform: translate(0,0) rotate(0deg); opacity: 1; }
+                20% { transform: translate(-10px, 0) rotate(-10deg); }
+                40% { transform: translate(10px, 0) rotate(10deg); }
+                60% { transform: translate(-10px, 0) rotate(-10deg); opacity: 0.8; }
+                80% { transform: translate(10px, 0) rotate(10deg); opacity: 0.4; filter: grayscale(1); }
+                100% { transform: scale(0); opacity: 0; }
             }
-            if(carta.tipo === 'tratamiento') {
-                if(carta.efecto === 'contagio') {
-                    if(!yo.cuerpo.some(o => o.virus > 0)) return "No tienes virus para propagar";
-                    return null;
+            @keyframes boomIn { 0% {transform:scale(0) rotate(-180deg);} 70%{transform:scale(1.2);} 100%{transform:scale(1) rotate(0);} }
+            @keyframes explosion { 0%{transform:scale(0.5); opacity:1;} 50%{transform:scale(1.5); opacity:1;} 100%{transform:scale(2); opacity:0;} }
+            
+            @keyframes organToGold { 0%{transform:scale(1); filter:none;} 50%{transform:scale(1.1); filter:sepia(1) saturate(5) hue-rotate(20deg);} 100%{transform:scale(0); opacity:0;} }
+            @keyframes shieldPop { 0%{transform:scale(0);} 60%{transform:scale(1.1);} 100%{transform:scale(1);} }
+            @keyframes glowPulse { 0%{opacity:0; transform:scale(0.8);} 50%{opacity:1; transform:scale(1.2);} 100%{opacity:0; transform:scale(1.5);} }
+            
+            /* Nuevas animaciones */
+            @keyframes swapLeft { 0%{transform: translateX(0) scale(1);} 50%{transform: translateX(200px) scale(0.8); opacity:0.5;} 100%{transform: translateX(200px) scale(1);} }
+            /* Ajustado para que visualmente se crucen. Nota: en realidad CSS no mueve el DOM, es visual. 
+               Mejor: Movimiento circular simple */
+            @keyframes swapLeft { 0%{transform: translateX(0);} 100%{transform: translateX(300px);} }
+            @keyframes swapRight { 0%{transform: translateX(0);} 100%{transform: translateX(-300px);} }
+            
+            @keyframes spinArrows { 0%{transform: rotate(0deg);} 100%{transform: rotate(360deg);} }
+            
+            @keyframes windFly { 0%{transform: translateX(0) rotate(0deg); opacity:0;} 10%{opacity:1;} 100%{transform: translateX(120vw) rotate(720deg); opacity:1;} }
+            @keyframes coughShake { 0%{transform: translateX(0);} 25%{transform: translateX(-10px);} 50%{transform: translateX(10px);} 75%{transform: translateX(-10px);} 100%{transform: translateX(0);} }
+            
+            @keyframes slap { 0%{transform: scale(5) rotate(-45deg); opacity:0;} 50%{transform: scale(1) rotate(0deg); opacity:1;} 80%{transform: scale(1.2) rotate(10deg);} 100%{transform: scale(1); opacity:0;} }
+            @keyframes flashWhite { 0%{opacity:0;} 50%{opacity:0.8;} 100%{opacity:0;} }
+            @keyframes floatUp { 0%{transform:translateY(100vh) scale(0);} 50%{transform:translateY(50vh) scale(1);} 100%{transform:translateY(0) scale(1.2); opacity:0;} }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // CLIENTE UTILS
+        // CLIENTE UTILS
+        // CLIENTE UTILS
+
+        function getIcono(arg1, arg2) { return getIcono_FIXED(arg1, arg2); }
+        function getIcono_FIXED(arg1, arg2) {
+            let c = { tipo: 'unknown', color: 'gray' };
+            if (arg1 && typeof arg1 === 'object') { c = arg1; }
+            else { c = { tipo: arg1, color: arg2 }; }
+
+            let t = c.tipo, col = c.color, ef = c.efecto;
+
+            // FIX: SI ES ESPECIAL DEBE TENER EFECTO
+            if (col === 'especial' && !ef && t !== 'unknown') {
+                // Intentar recuperar efecto del tipo si coincide con algun conocido
+                if (['guante', 'error', 'ladron', 'contagio', 'trasplante', 'esterilizacion'].includes(t)) ef = t;
+            }
+
+            if (col === 'multicolor') {
+                if (t === 'virus') return '👹';
+                if (t === 'medicina') return '🧰';
+                if (t === 'organo') return '🃏';
+            }
+            if (t === 'organo') {
+                if (col === 'rojo') return '❤️'; if (col === 'verde') return '🥩'; if (col === 'azul') return '🧠'; if (col === 'amarillo') return '🦴'; return '🃏';
+            }
+            if (t === 'virus') return '🦠';
+            if (t === 'medicina') return '💊';
+
+            if (ef === 'guante' || t === 'guante') return '🧤';
+            if (ef === 'error' || t === 'error') return '🔁';
+            if (ef === 'ladron' || t === 'ladron') return '🦹';
+            if (ef === 'contagio' || t === 'contagio') return '🤢';
+            if (ef === 'trasplante' || t === 'trasplante') return '🏥';
+            if (ef === 'esterilizacion' || t === 'esterilizacion') return '🧼';
+            return '⚡';
+        }
+        function getIcono_OLD(arg1, arg2) {
+            let c;
+            if (typeof arg1 === 'object' && arg1 !== null) {
+                c = arg1;
+            } else {
+                // Modo antiguo: getIcono(tipo, color)
+                // Reconstruimos un objeto dummy
+                c = { tipo: arg1, color: arg2 };
+                // Parche para Especiales que perdieron su efecto en el paso de argumentos
+                if (arg1 === 'tratamiento' && arg2 === 'especial') {
+                    // NO podemos saber cual es sin el objeto completo.
+                    // Pero en 'renderizarMano', se pasa el objeto completo.
+                    // Si estamos aqui es porque se llamo con (tipo, color).
+                    // Solo 'ultimaDescartada' hace esto. 
+                    // Si es especial generico, devolvemos rayo o intentamos adivinar?
+                    // Mejor devolver Rayo que romper.
                 }
-                if(carta.efecto === 'trasplante') {
-                    if(yo.cuerpo.length === 0) return "No tienes órganos";
-                    if(!Object.values(todosJugadores).some(j => j.id !== miId && j.cuerpo.some(o => !o.inmunizado))) return "Rivales sin órganos válidos";
-                }
-                if(carta.efecto === 'ladron') {
-                    let rivalesTienenRobable = Object.values(todosJugadores).some(j => 
-                        j.id !== miId && j.cuerpo.some(o => 
-                            !o.inmunizado && (o.color === 'multicolor' || !yo.cuerpo.find(mio => mio.color === o.color))
-                        )
-                    );
-                    if(!rivalesTienenRobable) return "Nada útil que robar";
-                }
             }
+
+            let t = c.tipo, col = c.color, ef = c.efecto;
+
+            // FIX: Si el objeto viene del servidor, 'efecto' debe estar. 
+            // Si no está, y es tratamiento especial, puede ser cualquiera.
+            // Si el objeto fue reconstruido manualmente {tipo: 'tratamiento', color: 'especial'}, ef es undefined.
+
+            if (col === 'multicolor' && t === 'virus') return '👹';
+            if (col === 'multicolor' && t === 'medicina') return '🧰';
+            if (t === 'organo') {
+                if (col === 'rojo') return '❤️'; if (col === 'verde') return '🥩'; if (col === 'azul') return '🧠'; if (col === 'amarillo') return '🦴'; return '🃏';
+            }
+            if (t === 'virus') return '🦠';
+            if (t === 'medicina') return '💊';
+
+            // Especiales
+            if (ef === 'guante') return '🧤';
+            if (ef === 'error') return '🔁';
+            if (ef === 'ladron') return '🦹';
+            if (ef === 'contagio') return '🤢';
+            if (ef === 'trasplante') return '🏥';
+            if (ef === 'esterilizacion') return '🧼';
+
+            // Fallback si algo falla
+            return '⚡';
+        }
+        function getNombreCarta(c) {
+            const MAPA = { 'rojo': 'Corazón', 'verde': 'Estómago', 'azul': 'Cerebro', 'amarillo': 'Hueso', 'multicolor': 'Comodín', 'virus': 'Virus', 'medicina': 'Medicina', 'error': 'Error Médico', 'guante': 'Guante', 'ladron': 'Ladrón', 'contagio': 'Contagio', 'trasplante': 'Trasplante', 'esterilizacion': 'Esterilización' };
+            if (c.tipo === 'organo') return MAPA[c.color] || 'Órgano';
+            return MAPA[c.efecto] || MAPA[c.tipo] || c.tipo;
+        }
+
+        // VALIDACIÓN TRASPLANTE CORREGIDA
+        function validarCarta(carta, yo, todos) {
+            if (!miTurno) return "Espera tu turno";
+            if (carta.tipo === 'organo') { if (yo.cuerpo.find(c => c.color === carta.color && c.color !== 'multicolor')) return "Ya tienes este color"; if (yo.cuerpo.length >= 5) return "Cuerpo lleno"; return null; }
+
+            if (carta.tipo === 'virus') { let hayObj = Object.values(todos).some(j => j.id !== miId && j.cuerpo.some(o => (o.color === carta.color || o.color === 'multicolor' || carta.color === 'multicolor') && !o.inmunizado)); return hayObj ? null : "Sin objetivo válido"; }
+
+            if (carta.tipo === 'medicina') { let hayObj = yo.cuerpo.some(o => (o.color === carta.color || o.color === 'multicolor' || carta.color === 'multicolor') && !o.inmunizado && o.medicinas < 2); return hayObj ? null : "Nada que curar/proteger"; }
+
+            if (carta.efecto === 'ladron') { let hay = Object.values(todos).some(j => j.id !== miId && j.cuerpo.some(o => !o.inmunizado && !yo.cuerpo.find(m => m.color === o.color))); return hay ? null : "Nada útil que robar"; }
+            if (carta.efecto === 'contagio' && !yo.cuerpo.some(c => c.virus > 0)) return "No tienes virus";
+
+            if (carta.efecto === 'trasplante') {
+                return null; // Siempre se puede intentar, la validación real es al clickar elementos
+            }
+            if (carta.efecto === 'esterilizacion') {
+                // Requiere seleccionar un órgano CUALQUIERA para definir el color.
+                // Validar que haya al menos un órgano en juego.
+                let hayOrganos = Object.values(todos).some(j => j.cuerpo.length > 0);
+                return hayOrganos ? null : "No hay órganos";
+            }
+
             return null;
         }
 
-        function toggleModoBasura(){ if(!miTurno)return; modoBasura=!modoBasura; seleccionadas=[]; document.getElementById('btn-toggle-basura').classList.toggle('activo'); document.getElementById('btn-confirmar-basura').style.display='none'; document.querySelectorAll('.target-valido').forEach(e=>e.classList.remove('target-valido')); renderizarMano(); }
-        function enviarDescarte(){ if(seleccionadas.length>0) socket.emit('descartar', seleccionadas); toggleModoBasura(); }
+        function clickTarget(targetId, organoIndex, domId) {
+            if (!miTurno || modoBasura) return;
+            if (seleccionadas.length === 0) return;
 
-        function renderizarMano() {
-            const d = document.getElementById('mis-cartas'); d.innerHTML = '';
-            const yo = jugadoresLocal[miId];
-            datosManoLocal.forEach((c, i) => {
-                let el = document.createElement('div'); el.innerHTML = generarCartaHTML(c);
-                let html = el.firstChild;
-                let error = null;
-                
-                let key = c.tipo === 'tratamiento' ? c.efecto : c.tipo;
-                let desc = DESCRIPCIONES[key] || "Carta";
+            let idxCarta = seleccionadas[0];
+            let carta = datosManoLocal[idxCarta];
 
-                if(!modoBasura) {
-                    error = validarCarta(c, datosManoLocal, yo, jugadoresLocal);
-                    if(error) { html.classList.add('carta-invalida'); html.title = `${desc}\n⛔ ${error}`; }
-                    else { html.title = desc; }
+            // Lógica Especial TRASPLANTE (2 Pasos)
+            if (carta.efecto === 'trasplante') {
+                // Paso 1: Seleccionar MI organo (Origen)
+                if (trasplanteOrigen === null) {
+                    if (targetId !== miId) { showTooltip(document.getElementById(domId), "Primero selecciona TU órgano"); return; }
+
+                    // Validar si es usable (no inmunizado)
+                    let yo = jugadoresLocal[miId];
+                    let miOrg = yo.cuerpo[organoIndex];
+                    if (miOrg.inmunizado) { showTooltip(document.getElementById(domId), "Este órgano está inmunizado"); return; }
+
+                    // SET ORIGEN
+                    trasplanteOrigen = parseInt(organoIndex);
+                    // Feedback visual inmediato
+                    let el = document.getElementById(domId);
+                    if (el) el.classList.add('seleccionada-trasplante');
+
+                    actualizarTargets(); // Re-render highlights for Step 2
+                    return;
                 }
-                if(!cartasAnimadas.has(c.id)) { html.classList.add('anim-robar'); html.style.animationDelay = `${i * 0.1}s`; cartasAnimadas.add(c.id); }
-                if(seleccionadas.includes(i)) html.classList.add(modoBasura?'seleccionada-basura':'seleccionada-jugar');
-                
-                html.onclick = () => {
-                    if(!modoBasura && error) return;
-                    if(modoBasura) {
-                        if(seleccionadas.includes(i)) seleccionadas=seleccionadas.filter(x=>x!==i); else seleccionadas.push(i);
-                        document.getElementById('btn-confirmar-basura').style.display = seleccionadas.length>0?'block':'none';
-                    } else {
-                        seleccionadas = seleccionadas.includes(i) ? [] : [i];
+                // Paso 2: Seleccionar RIVAL (Destino) y Ejecutar
+                else {
+                    if (targetId === miId) {
+                        // Si clicko en mi mismo tablero, cambio la selección origne
+                        // Validar si es usable (no inmunizado)
+                        let yo = jugadoresLocal[miId];
+                        let miOrg = yo.cuerpo[organoIndex];
+                        if (miOrg.inmunizado) { showTooltip(document.getElementById(domId), "Este órgano está inmunizado"); return; }
+                        trasplanteOrigen = organoIndex;
                         actualizarTargets();
+                        return;
                     }
-                    renderizarMano();
-                };
-                d.appendChild(html);
+                    // Es rival -> Intentar ejecutar
+                    let animEl = document.querySelector('.seleccionada-jugar');
+                    let targetEl = document.getElementById(domId);
+
+                    animarVuelo(animEl, targetEl, () => {
+                        socket.emit('jugarCarta', {
+                            indiceCarta: idxCarta,
+                            targetId: targetId,
+                            organoIndex: organoIndex,
+                            organoExtraIndex: trasplanteOrigen // Enviamos mi indice tambien
+                        });
+                        seleccionadas = []; trasplanteOrigen = null; renderizarMano();
+                    });
+                    return;
+                }
+            }
+
+            // Lógica Normal
+            let animEl = document.querySelector('.seleccionada-jugar');
+            let targetEl = document.getElementById(domId);
+
+            animarVuelo(animEl, targetEl, () => {
+                socket.emit('jugarCarta', { indiceCarta: idxCarta, targetId: targetId, organoIndex: organoIndex });
+                seleccionadas = []; trasplanteOrigen = null; renderizarMano();
             });
         }
 
         function actualizarTargets() {
-            document.querySelectorAll('.target-valido').forEach(e=>e.classList.remove('target-valido'));
-            if(modoBasura || !miTurno || seleccionadas.length!==1) return;
-            let idx = seleccionadas[0]; let carta = datosManoLocal[idx];
+            document.querySelectorAll('.target-valido').forEach(e => e.classList.remove('target-valido'));
+            document.querySelectorAll('.jugador-tablero').forEach(t => { t.style.boxShadow = "none"; t.onclick = null; });
+            document.querySelectorAll('.carta-mesa').forEach(cm => { cm.style.cursor = 'default'; cm.onclick = null; }); // Reset cursor and onclick
 
-            document.querySelectorAll('.carta-mesa').forEach(el => {
-                let pid = el.dataset.pid; let oIdx = parseInt(el.dataset.idx);
-                let organo = jugadoresLocal[pid].cuerpo[oIdx];
-                let esPropio = (pid === miId);
-                let valido = false;
-                
-                let match = (carta.color===organo.color || carta.color==='multicolor' || organo.color==='multicolor');
-                if(carta.tipo==='virus' && !esPropio && match && !organo.inmunizado) valido=true;
-                if(carta.tipo==='medicina' && esPropio && match) valido=true;
-                if(carta.efecto==='ladron' && !esPropio && !organo.inmunizado) {
-                    if(!jugadoresLocal[miId].cuerpo.find(o=>o.color===organo.color)) valido=true; 
-                }
-                if(carta.efecto==='trasplante' && !esPropio && !organo.inmunizado) {
-                    let tengoElMismo = jugadoresLocal[miId].cuerpo.find(m => m.color === organo.color);
-                    if(tengoElMismo && !tengoElMismo.inmunizado) valido=true;
-                }
-                
-                if(valido) {
-                    el.classList.add('target-valido');
-                    el.onclick = () => { socket.emit('jugarCarta', { indiceCarta: idx, targetId: pid, organoIndex: oIdx }); seleccionadas=[]; renderizarMano(); document.querySelectorAll('.target-valido').forEach(e=>e.classList.remove('target-valido')); };
-                } else el.onclick=null;
-            });
+            if (modoBasura || !selectedUid) { trasplanteOrigen = null; return; }
+            let idx = seleccionadas[0];
+            let c = datosManoLocal[idx];
+            let yo = jugadoresLocal[miId];
 
-            document.querySelectorAll('.jugador-tablero').forEach(tab => {
-                let pid = tab.dataset.pid; let esPropio = (pid === miId);
-                let valido = false;
-                if(carta.efecto==='error' && !esPropio) valido=true;
-                if((carta.efecto==='guante' || carta.efecto==='contagio') && esPropio) valido=true;
-                if(carta.tipo==='organo' && esPropio) if(!jugadoresLocal[miId].cuerpo.find(o=>o.color===carta.color)) valido=true;
-                
-                if(valido) {
-                    tab.style.boxShadow = "0 0 15px white"; tab.style.cursor="pointer";
-                    tab.onclick = (e) => {
-                        if(e.target.classList.contains('carta-mesa')) return;
-                        socket.emit('jugarCarta', { indiceCarta: idx, targetId: pid, organoIndex: null });
-                        seleccionadas=[]; renderizarMano(); limpiarTableros();
+            if (c.tipo === 'organo') {
+                // FIX: USAR ID DIRECTO
+                // El selector por data-pid a veces falla si el atributo no se actualizo
+                let miTablero = document.getElementById(`zona-jugador-${miId}`);
+                console.log("BUSCANDO TABLERO", miId, miTablero);
+                if (miTablero) {
+                    miTablero.classList.add('target-valido');
+                    miTablero.style.boxShadow = "0 0 20px cyan";
+                    miTablero.style.cursor = "pointer";
+                    miTablero.onclick = (e) => {
+                        console.log("CLICK EN TABLERO PROPIO");
+                        if (e.target.closest('.carta-mesa')) return;
+                        animarVuelo(document.querySelector('.seleccionada-jugar'), miTablero, () => {
+                            socket.emit('jugarCarta', { indiceCarta: idx, targetId: miId, organoIndex: null });
+                            seleccionadas = []; renderizarMano();
+                        });
                     };
-                } else { tab.style.boxShadow="none"; tab.onclick=null; }
+                }
+            }
+            else if (c.efecto === 'error') {
+                document.querySelectorAll('.jugador-tablero').forEach(t => {
+                    if (t.dataset.pid && t.dataset.pid !== miId) {
+                        t.style.boxShadow = "0 0 20px red"; t.style.cursor = "pointer";
+                        t.onclick = () => {
+                            animarVuelo(document.querySelector('.seleccionada-jugar'), t, () => {
+                                socket.emit('jugarCarta', { indiceCarta: idx, targetId: t.dataset.pid, organoIndex: null });
+                                seleccionadas = []; renderizarMano();
+                            });
+                        };
+                    }
+                });
+            }
+            else if (c.efecto === 'contagio' || c.efecto === 'guante') {
+                // Click en cualquier sitio del fondo para activar global
+                // Lo simulamos haciendo que el body capture o un boton, pero mejor: Click en MI tablero
+                let miTablero = document.querySelector(`.jugador-tablero[data-pid="${miId}"]`);
+                if (miTablero) {
+                    miTablero.style.boxShadow = "0 0 20px purple"; miTablero.style.cursor = "pointer";
+                    miTablero.onclick = (e) => {
+                        let animEl = document.querySelector('.seleccionada-jugar');
+                        animarVuelo(animEl, miTablero, () => {
+                            socket.emit('jugarCarta', { indiceCarta: idx, targetId: miId, organoIndex: null });
+                            seleccionadas = []; renderizarMano();
+                        });
+                    };
+                }
+            }
+            else if (c.efecto === 'trasplante') {
+                // FASE 1: Seleccionar Origen (Mio)
+                if (trasplanteOrigen === null) {
+                    yo.cuerpo.forEach((org, i) => {
+                        if (!org.inmunizado) {
+                            let el = document.getElementById(`organo-${miId}-${i}`);
+                            if (el) {
+                                el.classList.add('target-valido');
+                                el.style.cursor = 'pointer';
+                                // FORCE CLICK HANDLER FOR PHASE 1
+                                el.onclick = (e) => {
+                                    e.stopPropagation(); // Avoid bubbling issues
+                                    clickTarget(miId, i, el.id);
+                                };
+                            }
+                        }
+                    });
+                }
+                // FASE 2: Seleccionar Destino (Rival)
+                else {
+                    // Resaltar el origen seleccionado
+                    let elOrigen = document.getElementById(`organo-${miId}-${trasplanteOrigen}`);
+                    if (elOrigen) elOrigen.style.boxShadow = "0 0 15px 5px gold";
+
+                    // Buscar targets validos en rivales
+                    // Params: yo.cuerpo[trasplanteOrigen]
+                    let miOrg = yo.cuerpo[trasplanteOrigen];
+                    const calcEstado = (o) => { if (o.inmunizado) return 3; if (o.medicinas > 0) return 2; if (o.virus === 0) return 1; return 0; };
+
+                    Object.values(jugadoresLocal).forEach(rival => {
+                        if (rival.id === miId) return;
+                        rival.cuerpo.forEach((org, i) => {
+                            // Validaciones espejo del servidor
+                            if (org.inmunizado) return;
+                            if (calcEstado(miOrg) >= calcEstado(org)) return; // Mi estado debe ser peor
+
+                            // Conflictos Color
+                            // Rival recibe MI organo
+                            let rivalConflict = rival.cuerpo.some((x, idx) => idx !== i && (x.color === miOrg.color && x.color !== 'multicolor' && miOrg.color !== 'multicolor'));
+                            // Yo recibo SU organo
+                            let yoConflict = yo.cuerpo.some((x, idx) => idx !== trasplanteOrigen && (x.color === org.color && x.color !== 'multicolor' && org.color !== 'multicolor'));
+
+                            if (!rivalConflict && !yoConflict) {
+                                let el = document.getElementById(`organo-${rival.id}-${i}`);
+                                if (el) { el.classList.add('target-valido'); el.style.cursor = 'pointer'; }
+                            }
+                        });
+                    });
+                }
+            }
+            else {
+                // Organs/Virus/Medicinas/Ladron normal logic (unchanged essentially, just iterating DOM)
+                Object.values(jugadoresLocal).forEach(j => {
+                    j.cuerpo.forEach((targetOrgan, i) => {
+                        if (modoBasura) return;
+                        // Helper simulación servidor
+                        let valid = false;
+                        if (c.tipo === 'virus' && j.id !== miId && !targetOrgan.inmunizado && (targetOrgan.color === c.color || c.color === 'multicolor' || targetOrgan.color === 'multicolor')) valid = true;
+                        if (c.tipo === 'medicina' && j.id === miId && !targetOrgan.inmunizado && targetOrgan.medicinas < 2 && (targetOrgan.color === c.color || c.color === 'multicolor' || targetOrgan.color === 'multicolor')) valid = true;
+                        if (c.efecto === 'ladron' && j.id !== miId && !targetOrgan.inmunizado) {
+                            if (!yo.cuerpo.some(m => m.color === targetOrgan.color)) valid = true;
+                        }
+
+                        if (valid) {
+                            let el = document.getElementById(`organo-${j.id}-${i}`);
+                            if (el) {
+                                el.classList.add('target-valido');
+                                el.style.cursor = 'pointer';
+                                // FIX: Re-asociar evento de click porque 'actualizarTargets' limpia todo al principio
+                                el.onclick = (e) => {
+                                    if (e) e.stopPropagation();
+                                    clickTarget(j.id, i, el.id);
+                                };
+                            }
+                        }
+                    });
+                });
+            }
+        }
+
+        function toggleModoBasura() { if (!miTurno) return; modoBasura = !modoBasura; seleccionadas = []; document.getElementById('btn-confirmar-basura').style.display = modoBasura ? 'inline-block' : 'none'; document.getElementById('btn-toggle-basura').innerText = modoBasura ? "CANCELAR" : "🗑️ DESCARTAR"; renderizarMano(); }
+
+        function enviarDescarte() {
+            let btn = document.getElementById('btn-confirmar-basura');
+            if (btn.disabled) return; // Prevent double submit
+
+            let trash = document.getElementById('slot-basura');
+            let cartasDOM = document.querySelectorAll('.seleccionada-basura');
+            if (cartasDOM.length === 0) { toggleModoBasura(); return; }
+
+            btn.disabled = true; // DISABLE BUTTON
+            btn.innerText = "...";
+
+            let promises = [];
+            cartasDOM.forEach(card => promises.push(new Promise(r => animarVuelo(card, trash, r))));
+            Promise.all(promises).then(() => {
+                socket.emit('descartar', seleccionadas);
+                toggleModoBasura();
+                btn.disabled = false; btn.innerText = "CONFIRMAR"; // Reset state
             });
         }
-        function limpiarTableros() { document.querySelectorAll('.jugador-tablero').forEach(t=>{t.style.boxShadow="none"; t.onclick=null;}); }
-        function generarCartaHTML(c) { return `<div class="carta ${c.color}"><div class="icono">${getIcono(c.tipo, c.color, c.efecto)}</div><div>${getEtiquetaCarta(c)}</div></div>`; }
+
+        function usarCartaEspecial() {
+            animarVuelo(document.getElementById(selectedDom), document.getElementById('accion-log'), () => {
+                socket.emit('jugarCarta', { indiceCarta: selectedUid - 1, targetId: miId, organoIndex: null });
+                seleccionadas = []; selectedUid = null;
+            });
+        }
+
+        function renderizarMano() {
+            const d = document.getElementById('mis-cartas'); d.innerHTML = '';
+            const yo = jugadoresLocal[miId];
+
+            // FIX: Olvidar cartas que ya no tengo para que si vuelven (reciclaje) se animen de nuevo
+            let currentIds = new Set(datosManoLocal.map(c => c.id));
+            cartasAnimadas.forEach(id => { if (!currentIds.has(id)) cartasAnimadas.delete(id); });
+
+            let showSpecial = false;
+
+            datosManoLocal.forEach((c, i) => {
+                let el = document.createElement('div'); el.className = `carta ${c.color} carta-mano`;
+                el.id = `mano-${i}`;
+                if (c.color === 'multicolor') el.classList.add('multicolor');
+                if (c.color === 'especial') el.classList.add('especial');
+
+                let error = !modoBasura ? validarCarta(c, yo, jugadoresLocal) : null;
+                if (error) { el.classList.add('carta-invalida'); el.title = `${DESCRIPCIONES[c.efecto || c.tipo] || "Jugar"}\n⛔ ${error}`; }
+                else { el.title = DESCRIPCIONES[c.efecto || c.tipo] || "Jugar"; }
+
+                if (seleccionadas.includes(i)) el.classList.add(modoBasura ? 'seleccionada-basura' : 'seleccionada-jugar');
+
+                el.innerHTML = `<div class="icono">${getIcono(c)}</div><div class="nombre-carta">${getNombreCarta(c)}</div>`;
+                el.removeAttribute('title'); // Remove default browser tooltip
+
+                // Animación Mazo -> Mano (DINÁMICA y ROBUSTA)
+                // FIX: Ocultar inicialmente para evitar "flicker" antes de que arranque la animación
+                if (!cartasAnimadas.has(c.id)) el.style.opacity = '0';
+
+                d.appendChild(el);
+
+                if (!cartasAnimadas.has(c.id)) {
+                    // Small delay to ensure layout is computed by browser
+                    setTimeout(() => {
+                        let mazoEl = document.getElementById('visual-mazo');
+                        if (mazoEl) {
+                            let rMazo = mazoEl.getBoundingClientRect();
+                            let rCard = el.getBoundingClientRect();
+
+                            // Si el layout falla (rCard.width es 0), reintentamos o us valores por defecto
+                            if (rCard.width === 0) { el.style.opacity = '1'; return; }
+
+                            let dx = rMazo.left - rCard.left;
+                            let dy = rMazo.top - rCard.top;
+
+                            el.style.setProperty('--dx', `${dx}px`);
+                            el.style.setProperty('--dy', `${dy}px`);
+
+                            // Reset animation if needed
+                            el.classList.remove('anim-robar');
+                            void el.offsetWidth; // Force Reflow
+                            el.classList.add('anim-robar');
+                            el.style.opacity = ''; // Restaurar visibilidad (la animación controla el fade-in)
+
+                            cartasAnimadas.add(c.id);
+                        } else {
+                            el.style.opacity = '1'; // Fallback si no hay mazo
+                        }
+                    }, 50);
+                }
+
+                // Eventos Tooltip
+                let desc = `<b>${getNombreCarta(c)}</b><br><span style="color:#aaa; font-size:0.8rem;">${DESCRIPCIONES[c.efecto || c.tipo] || "Jugar"}</span>`;
+
+                // Add Context (Applicable Organ)
+                if ((c.tipo === 'virus' || c.tipo === 'medicina') && c.color !== 'multicolor') {
+                    desc += `<br><span style="color:cyan; font-size:0.8rem;">Aplicable a: ${getNombreCarta({ tipo: 'organo', color: c.color })}</span>`;
+                } else if ((c.tipo === 'virus' || c.tipo === 'medicina') && c.color === 'multicolor') {
+                    desc += `<br><span style="color:rainbow; font-size:0.8rem;">Aplicable a: CUALQUIERA</span>`;
+                }
+
+                if (error) desc += `<br><span style="color:#e74c3c;">⛔ ${error}</span>`;
+
+                el.onmouseenter = (e) => showTooltip(e, desc);
+                el.onmousemove = moveTooltip;
+                el.onmouseleave = hideTooltip;
+
+                el.onclick = (e) => {
+                    // EVITAR QUE OTROS ELEMENTOS ROBEN EL CLICK
+                    if (e) e.stopPropagation();
+                    if (e) e.stopPropagation();
+                    // Debug logs removed
+                    // if (!modoBasura && error) return; // REMOVED BLOCKING
+                    if (modoBasura) {
+                        if (seleccionadas.includes(i)) seleccionadas = seleccionadas.filter(x => x !== i); else seleccionadas.push(i);
+                        document.getElementById('btn-confirmar-basura').style.display = seleccionadas.length > 0 ? 'inline-block' : 'none';
+                    } else {
+                        // Allow clicking even with error to see selection/feedback
+                        clickCarta(i, el.id);
+                    }
+                    renderizarMano();
+                };
+
+                if (selectedUid === (i + 1) && !error && (c.efecto === 'guante' || c.efecto === 'contagio')) showSpecial = true;
+                // FIX: Error Médico ya no activa botón, requiere click en tablero
+            });
+            document.getElementById('btn-jugar-especial').style.display = showSpecial ? 'block' : 'none';
+        }
+
+        let trasplanteOrigen = null;
+
+        function clickCarta(idx, domId) {
+            if (modoBasura) {
+                let el = document.getElementById(domId);
+                let pos = seleccionadas.indexOf(idx);
+                if (pos >= 0) { seleccionadas.splice(pos, 1); el.classList.remove('descartar-on'); }
+                else { seleccionadas.push(idx); el.classList.add('descartar-on'); }
+                return;
+            }
+
+            // if (!miTurno) return; // Allow visual selection always
+
+
+            let el = document.getElementById(domId);
+            // Toggle seleccion
+            // Toggle seleccion (Note: selectedUid is 1-based)
+            let oneBasedIdx = idx + 1;
+
+            if (selectedUid === oneBasedIdx) {
+                // Deseleccionar
+                selectedUid = null; selectedDom = null; seleccionadas = [];
+                el.classList.remove('seleccionada-jugar');
+                document.querySelectorAll('.carta-mano').forEach(c => c.style.transform = "scale(1)");
+                document.getElementById('btn-jugar-especial').style.display = 'none';
+                document.getElementById('panel-esterilizacion').style.display = 'none'; // Ocultar si deselecciono
+                trasplanteOrigen = null;
+                actualizarTargets();
+                return;
+            }
+
+            // Nueva seleccion
+            document.querySelectorAll('.carta-mano').forEach(c => c.classList.remove('seleccionada-jugar'));
+            document.querySelectorAll('.carta-mano').forEach(c => c.style.transform = "scale(1)");
+
+            selectedUid = oneBasedIdx; selectedDom = domId; seleccionadas = [idx];
+            el.classList.add('seleccionada-jugar');
+            el.style.transform = "translateY(-30px) scale(1.1)";
+
+            // Esterilizacion Logic
+            let carta = datosManoLocal[idx];
+            if (carta.efecto === 'esterilizacion') {
+                // Mostrar panel de botones en vez de highlight targets
+                document.getElementById('panel-esterilizacion').style.display = 'flex';
+                // Ocultar boton especial si estaba
+                document.getElementById('btn-jugar-especial').style.display = 'none';
+            } else {
+                document.getElementById('panel-esterilizacion').style.display = 'none';
+                actualizarTargets();
+            }
+        }
+
+        function usarEsterilizacion(color) {
+            if (seleccionadas.length === 0) return;
+            let idx = seleccionadas[0];
+            let domId = `mano-${idx}`;
+            let animEl = document.getElementById(domId);
+
+            // Simular vuelo hacia centro? 
+            let mesa = document.getElementById('mesa');
+            animarVuelo(animEl, mesa, () => {
+                socket.emit('jugarCarta', { indiceCarta: idx, colorElegido: color });
+                seleccionadas = []; selectedUid = null;
+                document.getElementById('panel-esterilizacion').style.display = 'none';
+                renderizarMano();
+            });
+        }
+
+        // TARGETING CORREGIDO
+        function actualizarTargets() {
+            document.querySelectorAll('.target-valido').forEach(e => e.classList.remove('target-valido'));
+            document.querySelectorAll('.jugador-tablero').forEach(t => { t.style.boxShadow = "none"; t.onclick = null; });
+            document.querySelectorAll('.carta-mesa').forEach(cm => cm.onclick = null);
+
+            if (modoBasura || !selectedUid) return;
+            // selectedUid is 1-based, array is 0-based
+            let idx = selectedUid - 1;
+            let c = datosManoLocal[idx];
+            let yo = jugadoresLocal[miId];
+
+            if (c.tipo === 'organo') {
+                let miTablero = document.querySelector(`.jugador-tablero[data-pid="${miId}"]`);
+                if (miTablero) {
+                    miTablero.style.boxShadow = "0 0 20px cyan"; miTablero.style.cursor = "pointer";
+                    miTablero.onclick = (e) => {
+                        if (e.target.closest('.carta-mesa')) return;
+                        animarVuelo(document.querySelector('.seleccionada-jugar'), miTablero, () => {
+                            socket.emit('jugarCarta', { indiceCarta: idx, targetId: miId, organoIndex: null });
+                            seleccionadas = []; renderizarMano();
+                        });
+                    };
+                }
+            }
+            else if (c.efecto === 'error') {
+                document.querySelectorAll('.jugador-tablero').forEach(t => {
+                    if (t.dataset.pid && t.dataset.pid !== miId) {
+                        t.style.boxShadow = "0 0 20px red"; t.style.cursor = "pointer";
+                        t.onclick = () => {
+                            animarVuelo(document.querySelector('.seleccionada-jugar'), t, () => {
+                                socket.emit('jugarCarta', { indiceCarta: idx, targetId: t.dataset.pid, organoIndex: null });
+                                seleccionadas = []; renderizarMano();
+                            });
+                        };
+                    }
+                });
+            }
+            else {
+                document.querySelectorAll('.carta-mesa').forEach(el => {
+                    let pid = el.dataset.pid;
+                    let oIdx = parseInt(el.dataset.idx);
+                    let organo = jugadoresLocal[pid].cuerpo[oIdx];
+                    let esPropio = (pid === miId);
+                    let esValido = false;
+
+                    if (c.tipo === 'medicina' && esPropio) {
+                        if ((organo.color === c.color || organo.color === 'multicolor' || c.color === 'multicolor') && !organo.inmunizado && organo.medicinas < 2) esValido = true;
+                    }
+                    if (c.tipo === 'virus' && !esPropio) {
+                        if ((organo.color === c.color || organo.color === 'multicolor' || c.color === 'multicolor') && !organo.inmunizado) esValido = true;
+                    }
+                    if (c.efecto === 'ladron' && !esPropio && !organo.inmunizado) {
+                        if (!yo.cuerpo.find(m => m.color === organo.color)) esValido = true;
+                    }
+                    // TRASPLANTE: SELECCIONAR ÓRGANO DEL RIVAL
+                    if (c.efecto === 'trasplante' && !esPropio && !organo.inmunizado) {
+                        esValido = true;
+                    }
+
+                    if (esValido) {
+                        el.classList.add('target-valido');
+                        el.onclick = () => {
+                            animarVuelo(document.querySelector('.seleccionada-jugar'), el, () => {
+                                socket.emit('jugarCarta', { indiceCarta: idx, targetId: pid, organoIndex: oIdx });
+                                seleccionadas = []; renderizarMano();
+                            });
+                        };
+                    }
+                });
+            }
+        }
+
+        // ANIMACION VUELO SEGURA (FIXED COORDINATES)
+        function animarVuelo(origen, destino, cb) {
+            if (!origen || !destino) { if (cb) cb(); return; }
+
+            // Coordenadas iniciales (relativas al viewport)
+            let r1 = origen.getBoundingClientRect();
+            // Coordenadas finales
+            let r2 = destino.getBoundingClientRect();
+
+            // Clonar elemento para animar
+            let clon = origen.cloneNode(true);
+            clon.className = 'card-flying'; // Solo esta clase
+            // Añadir manualmente el estilo visual de la carta
+            Array.from(origen.classList).forEach(c => { if (['rojo', 'verde', 'azul', 'amarillo', 'multicolor', 'especial'].includes(c)) clon.classList.add(c) });
+            clon.innerHTML = origen.innerHTML;
+
+            // Posicionar clon exactamente donde está el original
+            clon.style.left = r1.left + 'px';
+            clon.style.top = r1.top + 'px';
+            clon.style.width = r1.width + 'px';
+            clon.style.height = r1.height + 'px';
+            clon.style.margin = '0';
+
+            document.body.appendChild(clon);
+
+            // Forzar reflow para que el navegador registre la posición inicial
+            void clon.offsetWidth;
+
+            // Calcular destino (centro del elemento destino)
+            let destX = r2.left + (r2.width / 2) - (r1.width / 2);
+            let destY = r2.top + (r2.height / 2) - (r1.height / 2);
+
+            // Aplicar transformación
+            clon.style.left = destX + 'px';
+            clon.style.top = destY + 'px';
+            clon.style.transform = 'scale(0.5) rotate(360deg)'; // Efecto de alejamiento y giro
+            clon.style.opacity = '0.2'; // Desvanecer al llegar
+
+            // Limpiar
+            setTimeout(() => {
+                clon.remove();
+                if (cb) cb();
+            }, 600); // 600ms duración CSS
+        }
+
+        function clickTarget(pid, idx, domId) {
+            if (!selectedUid) return;
+            animarVuelo(document.getElementById(selectedDom), document.getElementById(domId), () => {
+                socket.emit('jugarCarta', { indiceCarta: selectedUid - 1, targetId: pid, organoIndex: idx });
+                seleccionadas = []; selectedUid = null;
+            });
+        }
+        function clickTableroVacio(pid, domEl) {
+            if (!selectedUid) return;
+            animarVuelo(document.getElementById(selectedDom), domEl, () => {
+                socket.emit('jugarCarta', { indiceCarta: selectedUid - 1, targetId: pid, organoIndex: null });
+                seleccionadas = []; selectedUid = null;
+            });
+        }
+
+        function crearParticulas(el, type) {
+            let rect = el.getBoundingClientRect();
+            let color = (type === 'virus') ? '#2ecc71' : (type === 'cura') ? '#3498db' : 'gold';
+            let icon = (type === 'virus') ? '🦠' : (type === 'cura') ? '➕' : '🛡️';
+            for (let i = 0; i < 10; i++) {
+                let p = document.createElement('div'); p.className = 'particula'; p.innerText = icon; p.style.color = color;
+                p.style.left = (rect.left + 40) + 'px'; p.style.top = (rect.top + 60) + 'px';
+                p.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px'); p.style.setProperty('--ty', (Math.random() * 100 - 50) + 'px');
+                document.body.appendChild(p); setTimeout(() => p.remove(), 1000);
+            }
+        }
+    </script>
+    <script>
+        // BACKGROUND PARALLAX GENERATOR
+        const bgContainer = document.getElementById('bg-anim');
+        const emojis = ['🦠', '💊', '❤️', '🧪', '🧬', '💉', '🧫'];
+
+        for (let i = 0; i < 35; i++) {
+            let el = document.createElement('div');
+            el.classList.add('floater');
+
+            // Random Depth (1=close, 2=mid, 3=far)
+            let depth = Math.floor(Math.random() * 3) + 1;
+            el.classList.add(`depth-${depth}`);
+
+            el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+
+            // Random Position
+            el.style.left = Math.random() * 100 + 'vw';
+
+            // Random Speed based on depth
+            let duration = 20 + Math.random() * 25;
+            if (depth === 1) duration *= 0.7; // Close = Faster
+            if (depth === 3) duration *= 1.4; // Far = Slower
+
+            el.style.animationDuration = duration + 's';
+            el.style.animationDelay = -(Math.random() * 40) + 's';
+
+            bgContainer.appendChild(el);
+        }
     </script>
 </body>
+
 </html>
